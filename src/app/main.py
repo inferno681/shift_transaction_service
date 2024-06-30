@@ -20,8 +20,7 @@ class Transaction:
     ID: int
     sum: int
     type: TransactionType
-    created_at: datetime = field(
-        init=False, default_factory=datetime.now)
+    created_at: datetime = field(init=False, default_factory=datetime.now)
 
 
 class TransactionService:
@@ -58,18 +57,3 @@ class TransactionService:
         }
         report_storage.append(report)
         return report
-
-
-transaction_service = TransactionService()
-transaction1 = transaction_service.create_transaction(
-    ID=1, sum=100, type=TransactionType.DEBIT)
-transaction2 = transaction_service.create_transaction(
-    ID=1, sum=200, type=TransactionType.CREDIT)
-
-# Пример создания отчета
-start_date = datetime(2023, 1, 1)
-end_date = datetime(2028, 1, 1)
-report = transaction_service.transactions_report(
-    ID=1, start_date=start_date, end_date=end_date)
-
-print(report)
