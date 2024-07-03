@@ -6,10 +6,27 @@ before_script:
   - poetry config virtualenvs.create false
   - poetry install
 
+stages:
+  - lint
+  - test
+  - pre_commit
+
 lint:
+  stage: lint
+  rules:
+    - changes:
+      - src/**
   script:
-    - poetry run flake8 src/app
+    - poetry run flake8 src/
 
 test:
+  stage: test
   script:
     - poetry run pytest
+
+pre_commit:
+  stage: pre_commit
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - poetry run flake8 src/
