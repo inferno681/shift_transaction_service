@@ -1,0 +1,15 @@
+image: python:3.12-slim
+
+before_script:
+  - python --version ; pip --version
+  - pip install poetry
+  - poetry config virtualenvs.create false
+  - poetry install
+
+lint:
+  script:
+    - poetry run flake8 src/app
+
+test:
+  script:
+    - poetry run pytest
