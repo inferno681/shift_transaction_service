@@ -17,7 +17,7 @@ stages:
 lint:
   stage: lint
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         paths:
           - "src/**/*"
@@ -28,7 +28,7 @@ lint:
 mypy:
   stage: lint
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         paths:
           - "src/**/*"
@@ -41,12 +41,12 @@ test:
   script:
     - poetry run pytest --cov
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
 
 pre_commit:
   stage: pre_commit
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
     - poetry run flake8 src/
     - poetry run mypy src/
