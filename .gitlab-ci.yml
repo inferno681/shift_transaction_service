@@ -20,7 +20,7 @@ lint:
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - "src/**"
+          - "src/**/*"
         compare_to: "main"
   script:
     - poetry run flake8 src/
@@ -31,7 +31,7 @@ mypy:
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - "src/**"
+          - "src/**/*"
         compare_to: "main"
   script:
     - poetry run mypy src/
