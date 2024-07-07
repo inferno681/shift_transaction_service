@@ -10,6 +10,12 @@ from tests.conftest import USER_ID
 transaction_service = TransactionService()
 
 
+@pytest.mark.parametrize(
+    "transaction_data",
+    ("debit", "credit"),
+    indirect=True,
+    ids=("debit_transaction", "credit_transaction"),
+)
 def test_create_transaction(transaction_data):
     assert len(transaction_storage) == 0
     transaction_service.create_transaction(**transaction_data)
@@ -21,10 +27,10 @@ def test_create_transaction(transaction_data):
     assert transaction_storage[0].type == transaction_data["type"]
 
 
-def test_create_report(transaction_data):
+def test_create_report(debit_transaction, credit_transaction):
     assert len(report_storage) == 0
-    transaction = transaction_service.create_transaction(**transaction_data[0])
-    transaction_service.create_transaction(**transaction_data[1])
+    transaction = transaction_service.create_transaction(**debit_transaction)
+    transaction_service.create_transaction(**credit_transaction)
     transaction_service.create_report(
         user_id=USER_ID,
         start_date=(transaction.created_at - timedelta(days=1)),
@@ -43,5 +49,6 @@ def test_create_report(transaction_data):
 def test_wrong_values(invalid_transaction_data):
     with pytest.raises((ValueError, TypeError)) as excinfo:
         transaction_service.create_transaction(
-            **invalid_transaction_data["data"])
+            **invalid_transaction_data["data"]
+        )
     assert str(excinfo.value) == invalid_transaction_data["error_message"]
