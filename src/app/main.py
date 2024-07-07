@@ -3,6 +3,7 @@ from datetime import datetime
 from decimal import Decimal, getcontext
 from enum import Enum
 from itertools import count
+from typing import Any
 
 from app.constants import *
 
@@ -58,7 +59,7 @@ class TransactionService:
     @staticmethod
     def create_report(
         user_id: int, start_date: datetime, end_date: datetime
-    ) -> dict[str, any]:
+    ) -> dict[str, Any]:
         """Формирование отчета по транзакциям пользователя"""
         transactions = [
             transaction
