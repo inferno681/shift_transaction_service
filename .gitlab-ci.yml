@@ -50,4 +50,4 @@ pre_commit:
   script:
     - poetry run flake8 src/
     - poetry run mypy src/
-    - poetry run pytest --cov
+    - poetry run pytest --cov --cov-fail-under=90
