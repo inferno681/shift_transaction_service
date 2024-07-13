@@ -7,7 +7,7 @@ services:
     volumes:
       - ..:/workspace:cached
     ports:
-      - '28080:8080'
+      - '28087:8080'
     command: sleep infinity
     cap_add:
       - SYS_PTRACE
