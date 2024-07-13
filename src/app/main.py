@@ -5,7 +5,17 @@ from enum import Enum
 from itertools import count
 from typing import Any
 
-from app.constants import *
+from app.constants import (
+    CREDIT,
+    DEBIT,
+    INVALID_DECIMAL_MESSAGE,
+    INVALID_INT_FLOAT_MESSAGE,
+    INVALID_INT_MESSAGE,
+    INVALID_TRANSACTION_TYPE_MESSAGE,
+    TRANSACTIONS,
+    WRONG_AMOUNT_MESSAGE,
+    WRONG_ID_MESSAGE,
+)
 
 transaction_storage = []
 report_storage = []
@@ -13,54 +23,84 @@ getcontext().prec = 2
 
 
 class TransactionType(Enum):
-    DEBIT = DEBIT
-    CREDIT = CREDIT
+    """Типы транзакций."""
+
+    DEBIT = DEBIT  # noqa: WPS115
+    CREDIT = CREDIT  # noqa: WPS115
+
+
+def generate_id():
+    """Генератор уникальных ID, начиная с 1."""
+    return next(count(1))
 
 
 @dataclass(frozen=True)
 class Transaction:
-    """Класс транзакции"""
+    """Класс транзакции."""
 
-    id: int = field(default_factory=count(1).__next__, init=False)
+    id: int = field(default_factory=generate_id, init=False)
     user_id: int
-    sum: Decimal
-    type: TransactionType
+    amount: Decimal
+    transaction_type: TransactionType
     created_at: datetime = field(init=False, default_factory=datetime.now)
 
     def __post_init__(self):
+        """Проверка типов и значений."""
+        self._validate_user_id()
+        self._validate_amount()
+        self._validate_transaction_type()
+
+    def _validate_user_id(self):
+        """Проверка корректности идентификатора пользователя."""
         if not isinstance(self.user_id, int):
-            raise TypeError(INVALID_INT.format(value=self.user_id))
-        if not isinstance(self.sum, Decimal):
-            raise TypeError(INVALID_DECIMAL.format(value=self.sum))
-        if not isinstance(self.type, TransactionType):
-            raise TypeError(INVALID_TRANSACTION_TYPE.format(value=self.type))
-        if self.sum < 0:
-            raise ValueError(WRONG_SUM)
+            raise TypeError(INVALID_INT_MESSAGE.format(value=self.user_id))
         if self.user_id <= 0:
-            raise ValueError(WRONG_ID)
+            raise ValueError(WRONG_ID_MESSAGE)
+
+    def _validate_amount(self):
+        """Проверка корректности суммы транзакции."""
+        if not isinstance(self.amount, Decimal):
+            raise TypeError(INVALID_DECIMAL_MESSAGE.format(value=self.amount))
+        if self.amount < 0:
+            raise ValueError(WRONG_AMOUNT_MESSAGE)
+
+    def _validate_transaction_type(self):
+        """Проверка корректности типа транзакции."""
+        if not isinstance(self.transaction_type, TransactionType):
+            raise TypeError(
+                INVALID_TRANSACTION_TYPE_MESSAGE.format(
+                    value=self.transaction_type,
+                ),
+            )
 
 
 class TransactionService:
-    """Класс с методами для работы с транзакциями"""
+    """Класс с методами для работы с транзакциями."""
 
     @staticmethod
     def create_transaction(
-        user_id: int, sum: int | float, type: TransactionType
+        user_id: int,
+        amount: int | float,
+        transaction_type: TransactionType,
     ) -> Transaction:
-        """Создание транзакции и добавление ее в хранилище"""
-        if not isinstance(sum, (int, float)):
-            raise TypeError(INVALID_INT_FLOAT.format(value=sum))
+        """Создание транзакции и добавление ее в хранилище."""
+        if not isinstance(amount, (int, float)):
+            raise TypeError(INVALID_INT_FLOAT_MESSAGE.format(value=amount))
         transaction = Transaction(
-            user_id=user_id, sum=Decimal(str(sum)) / Decimal("1.00"), type=type
+            user_id=user_id,
+            amount=Decimal(str(amount)) / Decimal('1.00'),
+            transaction_type=transaction_type,
         )
         transaction_storage.append(transaction)
         return transaction
 
     @staticmethod
     def create_report(
-        user_id: int, start_date: datetime, end_date: datetime
+        user_id: int,
+        start_date: datetime,
+        end_date: datetime,
     ) -> dict[str, Any]:
-        """Формирование отчета по транзакциям пользователя"""
+        """Формирование отчета по транзакциям пользователя."""
         transactions = [
             transaction
             for transaction in transaction_storage
@@ -70,10 +110,14 @@ class TransactionService:
         report = {
             TRANSACTIONS: transactions,
             DEBIT: sum(
-                t.sum for t in transactions if t.type == TransactionType.DEBIT
+                transaction.amount
+                for transaction in transactions
+                if transaction.transaction_type == TransactionType.DEBIT
             ),
             CREDIT: sum(
-                t.sum for t in transactions if t.type == TransactionType.CREDIT
+                transaction.amount
+                for transaction in transactions
+                if transaction.transaction_type == TransactionType.CREDIT
             ),
         }
         report_storage.append(report)

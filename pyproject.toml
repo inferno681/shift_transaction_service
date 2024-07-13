@@ -12,10 +12,10 @@ python = "^3.12"
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.1.0"
 isort = "^5.13.2"
-black = "^24.4.2"
 pytest = "^8.2.2"
 mypy = "^1.10.1"
 pytest-cov = "^5.0.0"
+wemake-python-styleguide = "^0.19.2"
 
 [build-system]
 requires = ["poetry-core"]
