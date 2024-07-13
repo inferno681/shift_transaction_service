@@ -15,7 +15,9 @@
         "ghcr.io/devcontainers/features/python:1": {
             "version": "3.12",
             "installTools": true,
-            "toolsToInstall": ["poetry"]
+            "toolsToInstall": [
+                "poetry"
+            ]
         }
     },
     "remoteEnv": {
@@ -38,7 +40,8 @@
     },
     "mounts": [
         "source=transaction-service,target=/commandhistory,type=volume",
-        "source=${env:HOME}${env:USERPROFILE}/.kube,target=/usr/local/share/kube-localhost,type=bind"
+        "source=${env:HOME}${env:USERPROFILE}/.kube,target=/usr/local/share/kube-localhost,type=bind",
+        "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached,readonly"
     ],
     "remoteUser": "root"
 }
