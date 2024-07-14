@@ -13,11 +13,12 @@ stages:
   - lint
   - test
   - pre_commit
+  - coverage
 
 lint:
   stage: lint
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         paths:
           - "src/**/*"
@@ -28,7 +29,7 @@ lint:
 mypy:
   stage: lint
   rules:
-    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
       changes:
         paths:
           - "src/**/*"
@@ -51,3 +52,16 @@ pre_commit:
     - poetry run flake8 src/
     - poetry run mypy src/
     - poetry run pytest --cov --cov-fail-under=90
+
+coverage:
+  stage: coverage
+  rules:
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+  script:
+    - poetry run pytest --cov --cov-report xml
+  artifacts:
+    paths:
+      - coverage.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
