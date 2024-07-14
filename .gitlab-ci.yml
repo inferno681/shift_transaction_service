@@ -60,8 +60,7 @@ coverage:
   script:
     - poetry run pytest --cov --cov-report xml
   artifacts:
-    paths:
-      - coverage.xml
     reports:
       coverage_report:
         coverage_format: cobertura
+        path: coverage.xml
