@@ -1,14 +1,16 @@
-"""Названия полей"""
-CREDIT = "пополнение"
-DEBIT = "списание"
-TRANSACTIONS = "Транзакции"
+"""Названия полей."""
+CREDIT = 'пополнение'
+DEBIT = 'списание'
+TRANSACTIONS = 'Транзакции'
 
-"""Ошибки типов и значений"""
-INVALID_INT = "Значение {value} не соответствует типу int"
-INVALID_INT_FLOAT = "Значение {value} не соответствует типам int или float"
-INVALID_DECIMAL = "Значение {value} не соответствует типу decimal"
-INVALID_TRANSACTION_TYPE = (
-    "Значение {value} не соответствует типу TransactionType"
+"""Ошибки типов и значений."""
+INVALID_INT_MESSAGE = 'Значение {value} не соответствует типу int'
+INVALID_INT_FLOAT_MESSAGE = (
+    'Значение {value} не соответствует типам int или float'
 )
-WRONG_SUM = "Сумма транзакции не может быть меньше нуля"
-WRONG_ID = "Идентификатор должен быть положительным"
+INVALID_DECIMAL_MESSAGE = 'Значение {value} не соответствует типу decimal'
+INVALID_TRANSACTION_TYPE_MESSAGE = (
+    'Значение {value} не соответствует типу TransactionType'
+)
+WRONG_AMOUNT_MESSAGE = 'Сумма транзакции не может быть меньше нуля'
+WRONG_ID_MESSAGE = 'Идентификатор должен быть положительным'

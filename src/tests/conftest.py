@@ -1,14 +1,21 @@
 import pytest
 
-from app.constants import *
+from app.constants import (
+    INVALID_INT_FLOAT_MESSAGE,
+    INVALID_INT_MESSAGE,
+    INVALID_TRANSACTION_TYPE_MESSAGE,
+    WRONG_AMOUNT_MESSAGE,
+    WRONG_ID_MESSAGE,
+)
 from app.main import TransactionType, report_storage, transaction_storage
 
 USER_ID = 1
-WRONG_VALUE = "str"
+WRONG_VALUE = 'str'
 
 
 @pytest.fixture(autouse=True)
 def data_storage():
+    """Фикстура для очистки хранилища перед каждым текстом."""
     transaction_storage.clear()
     report_storage.clear()
     yield
@@ -16,86 +23,94 @@ def data_storage():
     report_storage.clear()
 
 
-"""Константы для тестов"""
-
-
 @pytest.fixture()
 def debit_transaction():
+    """Фикстура транзакции списания."""
     return {
-        "user_id": USER_ID,
-        "sum": 100,
-        "type": TransactionType.DEBIT,
+        'user_id': USER_ID,
+        'amount': 100,
+        'transaction_type': TransactionType.DEBIT,
     }
 
 
 @pytest.fixture()
 def credit_transaction():
+    """Фикстура транзакции пополнения."""
     return {
-        "user_id": USER_ID,
-        "sum": 200,
-        "type": TransactionType.CREDIT,
+        'user_id': USER_ID,
+        'amount': 200,
+        'transaction_type': TransactionType.CREDIT,
     }
 
 
 @pytest.fixture
 def transaction_data(request, debit_transaction, credit_transaction):
-    if request.param == "debit":
+    """Фикстура подстановки транзакций списания и пополнения."""
+    if request.param == 'debit':
         return debit_transaction
-    elif request.param == "credit":
+    elif request.param == 'credit':
         return credit_transaction
     else:
-        raise ValueError(INVALID_TRANSACTION_TYPE.format(value=request.param))
-
-
-"""Константы для теста на ошибки"""
+        raise ValueError(
+            INVALID_TRANSACTION_TYPE_MESSAGE.format(value=request.param),
+        )
 
 
 @pytest.fixture(
     params=(
         {
-            "data": {
-                "user_id": WRONG_VALUE,
-                "sum": 100,
-                "type": TransactionType.DEBIT,
+            'data': {
+                'user_id': WRONG_VALUE,
+                'amount': 100,
+                'transaction_type': TransactionType.DEBIT,
             },
-            "error_message": INVALID_INT.format(value=WRONG_VALUE),
+            'error_message': INVALID_INT_MESSAGE.format(value=WRONG_VALUE),
         },
         {
-            "data": {
-                "user_id": -1,
-                "sum": 100,
-                "type": TransactionType.DEBIT,
+            'data': {
+                'user_id': -1,
+                'amount': 100,
+                'transaction_type': TransactionType.DEBIT,
             },
-            "error_message": WRONG_ID,
+            'error_message': WRONG_ID_MESSAGE,
         },
         {
-            "data": {
-                "user_id": 123,
-                "sum": -100,
-                "type": TransactionType.DEBIT,
+            'data': {
+                'user_id': 123,
+                'amount': -100,
+                'transaction_type': TransactionType.DEBIT,
             },
-            "error_message": WRONG_SUM,
+            'error_message': WRONG_AMOUNT_MESSAGE,
         },
         {
-            "data": {
-                "user_id": 123,
-                "sum": WRONG_VALUE,
-                "type": TransactionType.DEBIT,
+            'data': {
+                'user_id': 123,
+                'amount': WRONG_VALUE,
+                'transaction_type': TransactionType.DEBIT,
             },
-            "error_message": INVALID_INT_FLOAT.format(value=WRONG_VALUE),
+            'error_message': INVALID_INT_FLOAT_MESSAGE.format(
+                value=WRONG_VALUE,
+            ),
         },
         {
-            "data": {
-                "user_id": 123,
-                "sum": 100,
-                "type": WRONG_VALUE,
+            'data': {
+                'user_id': 123,
+                'amount': 100,
+                'transaction_type': WRONG_VALUE,
             },
-            "error_message": INVALID_TRANSACTION_TYPE.format(
-                value=WRONG_VALUE
+            'error_message': INVALID_TRANSACTION_TYPE_MESSAGE.format(
+                value=WRONG_VALUE,
             ),
         },
     ),
-    ids=("wrong_id", "negative_id", "negative_sum", "wrong_sum", "wrong_type"),
+    ids=(
+        'wrong_id',
+        'negative_id',
+        'negative_amount',
+        'wrong_amount',
+        'wrong_transaction_type',
+    ),
 )
 def invalid_transaction_data(request):
+    """Фикстура с некорректными транзакциями."""
     return request.param
