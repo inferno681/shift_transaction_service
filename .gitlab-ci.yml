@@ -57,7 +57,7 @@ coverage:
   stage: coverage
   script:
     - poetry run pytest --cov=src --cov-report term-missing --cov-report xml
-  coverage: '/TOTAL.*\s+(\d+%)$/'
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%\|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
       coverage_report:
