@@ -4,7 +4,11 @@ from decimal import Decimal
 import pytest
 
 from app.constants import CREDIT, DEBIT, TRANSACTIONS
-from app.main import TransactionService, report_storage, transaction_storage
+from src.app.service import (
+    TransactionService,
+    report_storage,
+    transaction_storage,
+)
 from tests.conftest import USER_ID
 
 transaction_service = TransactionService()
