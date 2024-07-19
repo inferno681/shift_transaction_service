@@ -4,7 +4,7 @@ from decimal import Decimal
 import pytest
 
 from app.constants import CREDIT, DEBIT, TRANSACTIONS
-from src.app.service import (
+from app.service import (
     TransactionService,
     report_storage,
     transaction_storage,
