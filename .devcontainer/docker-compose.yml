@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: 'transaction-service'
+    container_name: 'transaction_service_stakrotckii'
     build:
       context: app/
       dockerfile: Dockerfile
