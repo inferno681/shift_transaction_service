@@ -29,16 +29,14 @@ class TransactionType(Enum):
     CREDIT = CREDIT  # noqa: WPS115
 
 
-def generate_id():
-    """Генератор уникальных ID, начиная с 1."""
-    return next(count(1))
+_id_counter = count(1)
 
 
 @dataclass(frozen=True)
 class Transaction:
     """Класс транзакции."""
 
-    id: int = field(default_factory=generate_id, init=False)
+    id: int = field(default_factory=lambda: next(_id_counter), init=False)
     user_id: int
     amount: Decimal
     transaction_type: TransactionType
@@ -108,6 +106,8 @@ class TransactionService:
             and start_date <= transaction.created_at <= end_date
         ]
         report = {
+            'start_date': start_date,
+            'end_date': end_date,
             TRANSACTIONS: transactions,
             DEBIT: sum(
                 transaction.amount
