@@ -1,5 +1,6 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
+from datetime import datetime, timedelta
 
 from app.constants import CREDIT, DEBIT, INVALID_TRANSACTION_TYPE_MESSAGE
 from app.main import app
@@ -70,3 +71,19 @@ def transaction_data(request, debit_transaction, credit_transaction):
 def create_transaction_link():
     """Ссылка на создание транзакции."""
     return '/create_transaction'
+
+
+@pytest.fixture
+def create_report_link():
+    """Ссылка на создание отчета."""
+    return '/create_report'
+
+
+@pytest.fixture
+def report_data():
+    """Данные для запроса отчета."""
+    return {
+        'user_id': USER_ID,
+        'start_date': (datetime.now() - timedelta(days=1)),
+        'end_date': (datetime.now() + timedelta(days=1)),
+    }

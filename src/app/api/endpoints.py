@@ -19,4 +19,4 @@ async def create_transaction(transaction: TransactionCreate):
 @router.post('/create_report', response_model=TransactionReport)
 async def create_report(report_request: TransactionReportCreate):
     """Эндпоинт создания транзакции."""
-    return TransactionService.create_transaction(**report_request.model_dump())
+    return TransactionService.create_report(**report_request.model_dump())

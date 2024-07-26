@@ -38,3 +38,21 @@ async def test_create_transaction(
         )
         / Decimal('1.00'),
     )
+
+
+@pytest.mark.anyio
+async def test_create_report(
+    client,
+    debit_transaction,
+    credit_transaction,
+    create_report_link,
+    create_transaction_link,
+    report_data,
+):
+    """Тест создания отчета."""
+    await client.post(create_transaction_link, json=debit_transaction)
+    await client.post(create_transaction_link, json=credit_transaction)
+    response = await client.post(create_report_link, json=report_data)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data['transactions']) == 2

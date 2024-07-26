@@ -28,15 +28,6 @@ class TransactionReportCreate(BaseModel):
     start_date: datetime
     end_date: datetime
 
-    @model_validator(mode='after')
-    def check_dates(self, values):
-        """Проверка дат."""
-        start_date = values.get('start_date')
-        end_date = values.get('end_date')
-        if start_date and end_date and start_date > end_date:
-            raise ValidationError(INVALID_DATES)
-        return values
-
 
 class TransactionReport(BaseModel):
     """Схема отчета."""
