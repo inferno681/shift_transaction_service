@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
+
 import pytest
 from httpx import ASGITransport, AsyncClient
-from datetime import datetime, timedelta
 
 from app.constants import CREDIT, DEBIT, INVALID_TRANSACTION_TYPE_MESSAGE
 from app.main import app
@@ -84,6 +85,6 @@ def report_data():
     """Данные для запроса отчета."""
     return {
         'user_id': USER_ID,
-        'start_date': (datetime.now() - timedelta(days=1)),
-        'end_date': (datetime.now() + timedelta(days=1)),
+        'start_date': (datetime.now() - timedelta(days=1)).isoformat(),
+        'end_date': (datetime.now() + timedelta(days=1)).isoformat(),
     }

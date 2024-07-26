@@ -12,7 +12,6 @@ from app.constants import (
     INVALID_INT_FLOAT_MESSAGE,
     INVALID_INT_MESSAGE,
     INVALID_TRANSACTION_TYPE_MESSAGE,
-    TRANSACTIONS,
     WRONG_AMOUNT_MESSAGE,
     WRONG_ID_MESSAGE,
 )
@@ -106,15 +105,16 @@ class TransactionService:
             and start_date <= transaction.created_at <= end_date
         ]
         report = {
+            'user_id': user_id,
             'start_date': start_date,
             'end_date': end_date,
-            TRANSACTIONS: transactions,
-            DEBIT: sum(
+            'transactions': transactions,
+            'debit': sum(
                 transaction.amount
                 for transaction in transactions
                 if transaction.transaction_type == TransactionType.DEBIT
             ),
-            CREDIT: sum(
+            'credit': sum(
                 transaction.amount
                 for transaction in transactions
                 if transaction.transaction_type == TransactionType.CREDIT

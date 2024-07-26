@@ -28,10 +28,20 @@ class TransactionReportCreate(BaseModel):
     start_date: datetime
     end_date: datetime
 
+    @model_validator(mode='after')
+    def check_dates(self):
+        """Проверка дат."""
+        start_date = self.start_date
+        end_date = self.end_date
+        if start_date and end_date and start_date > end_date:
+            raise ValidationError(INVALID_DATES)
+        return self
+
 
 class TransactionReport(BaseModel):
     """Схема отчета."""
 
+    user_id: PositiveInt
     start_date: datetime
     end_date: datetime
     transactions: list[Transaction] | list
