@@ -3,14 +3,13 @@ from decimal import Decimal
 
 from pydantic import (
     BaseModel,
-    Field,
     PositiveFloat,
     PositiveInt,
     ValidationError,
     model_validator,
 )
 
-from app.constants import CREDIT, DEBIT, INVALID_DATES, TRANSACTIONS
+from app.constants import INVALID_DATES
 from app.service import Transaction, TransactionType
 
 
@@ -30,7 +29,7 @@ class TransactionReportCreate(BaseModel):
     end_date: datetime
 
     @model_validator(mode='after')
-    def check_dates(cls, values):
+    def check_dates(self, values):
         """Проверка дат."""
         start_date = values.get('start_date')
         end_date = values.get('end_date')

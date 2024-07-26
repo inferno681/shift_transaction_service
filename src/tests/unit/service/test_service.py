@@ -1,11 +1,11 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
 
 from app.constants import CREDIT, DEBIT, TRANSACTIONS
 from app.service import TransactionService, report_storage, transaction_storage
-from tests.conftest import USER_ID
+from tests.unit.service.conftest import USER_ID
 
 transaction_service = TransactionService()
 
@@ -18,8 +18,10 @@ transaction_service = TransactionService()
     ],
     indirect=True,
 )
-def test_create_transaction(transaction_data):
+def test_create_transaction(transaction_data, monkeypatch):
     """Тест создания транзакций."""
+    frozen_time = datetime.now()
+    monkeypatch.setattr('app.service.service.datetime', lambda: frozen_time)
     transaction_service.create_transaction(**transaction_data)
     assert len(transaction_storage) == 1
     assert transaction_storage[0].user_id == transaction_data['user_id']
@@ -30,6 +32,7 @@ def test_create_transaction(transaction_data):
         transaction_storage[0].transaction_type
         == transaction_data['transaction_type']
     )
+    assert transaction_storage[0].created_at == frozen_time
 
 
 def test_create_report(debit_transaction, credit_transaction):

@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class _SettingsModel(BaseSettings):
+    """Базовые настройки."""
 
     @classmethod
     def from_yaml(cls, config_path: str) -> '_SettingsModel':
@@ -28,6 +29,8 @@ class _SettingsModel(BaseSettings):
 
 
 class _ServiceSettings(_SettingsModel):
+    """Валидация настроек из файла YAML."""
+
     host: str
     port: int
     debug: bool
@@ -39,4 +42,4 @@ class Settings(_SettingsModel):
     service: _ServiceSettings
 
 
-config = Settings.from_yaml('./src/config/config.yaml')
+config = Settings.from_yaml('.src/config/config.yaml')

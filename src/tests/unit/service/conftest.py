@@ -43,7 +43,7 @@ def credit_transaction():
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def transaction_data(request, debit_transaction, credit_transaction):
     """Фикстура подстановки транзакций списания и пополнения."""
     if request.param == 'debit':
