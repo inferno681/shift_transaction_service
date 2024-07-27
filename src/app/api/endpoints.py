@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.schemas import (
+from app.api.schemes import (
     TransactionCreate,
     TransactionReport,
     TransactionReportCreate,
