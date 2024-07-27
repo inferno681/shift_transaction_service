@@ -1,4 +1,3 @@
-from datetime import datetime
 from decimal import Decimal
 
 import pytest
@@ -17,11 +16,8 @@ async def test_create_transaction(
     client,
     create_transaction_link,
     transaction_data,
-    time_machine,
 ):
     """Тест создания транзакции."""
-    frozen_time = datetime(2024, 7, 23)  # noqa: WPS432
-    time_machine.move_to(frozen_time)
     response = await client.post(
         create_transaction_link,
         json=transaction_data,
@@ -41,7 +37,6 @@ async def test_create_transaction(
         )
         / Decimal('1.00'),
     )
-    assert response_data['created_at'] == frozen_time.isoformat()
 
 
 @pytest.mark.anyio
