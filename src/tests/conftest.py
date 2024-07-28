@@ -7,7 +7,7 @@ from app.constants import (
     WRONG_AMOUNT_MESSAGE,
     WRONG_ID_MESSAGE,
 )
-from app.main import TransactionType, report_storage, transaction_storage
+from app.service import TransactionType, report_storage, transaction_storage
 
 USER_ID = 1
 WRONG_VALUE = 'str'
