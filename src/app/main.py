@@ -4,9 +4,19 @@ from fastapi import FastAPI
 from app.api import router
 from config import config
 
-app = FastAPI(debug=config.service.debug)  # type: ignore
+tags_metadata = [config.service.tags_metadata]  # type: ignore
+app = FastAPI(
+    title=config.service.title,  # type: ignore
+    description=config.service.description,  # type: ignore
+    tags_metadata=tags_metadata,
+    debug=config.service.debug,  # type: ignore
+)  # type: ignore
 
-app.include_router(router)
+app.include_router(
+    router,
+    prefix='/api',
+    tags=[config.service.tags_metadata['name']],  # type: ignore
+)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,9 @@
 service:
+  title: "Transaction service"
+  description: "Сервис транзакций"
   host: "localhost"
-  port: 8000
+  port: 8002
   debug: True
+  tags_metadata:
+    name: "Transaction"
+    description: "Управление транзакциями"

@@ -9,7 +9,9 @@ class _SettingsModel(BaseSettings):
 
     @classmethod
     def from_yaml(cls, config_path: str) -> '_SettingsModel':
-        return cls(**yaml.safe_load(Path(config_path).read_text()))
+        return cls(
+            **yaml.safe_load(Path(config_path).read_text(encoding='utf-8')),
+        )
 
     model_config = SettingsConfigDict(
         case_sensitive=False,
@@ -31,9 +33,12 @@ class _SettingsModel(BaseSettings):
 class _ServiceSettings(_SettingsModel):
     """Валидация настроек из файла YAML."""
 
+    title: str
+    description: str
     host: str
     port: int
     debug: bool
+    tags_metadata: dict[str, str]
 
 
 class Settings(_SettingsModel):

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal, getcontext
 from enum import Enum
 from itertools import count
@@ -39,7 +39,10 @@ class Transaction:
     user_id: int
     amount: Decimal
     transaction_type: TransactionType
-    created_at: datetime = field(init=False, default_factory=datetime.now)
+    created_at: datetime = field(
+        init=False,
+        default_factory=lambda: datetime.now(UTC),
+    )
 
     def __post_init__(self):
         """Проверка типов и значений."""

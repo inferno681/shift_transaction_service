@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -30,7 +30,7 @@ async def client():
     """Фикстура клиента."""
     async with AsyncClient(
         transport=ASGITransport(app=app),
-        base_url='http://127.0.0.1:8000/',
+        base_url='http://127.0.0.1:8000/api/',
     ) as client:
         yield client
 
@@ -85,6 +85,6 @@ def report_data():
     """Данные для запроса отчета."""
     return {
         'user_id': USER_ID,
-        'start_date': (datetime.now() - timedelta(days=1)).isoformat(),
-        'end_date': (datetime.now() + timedelta(days=1)).isoformat(),
+        'start_date': (datetime.now(UTC) - timedelta(days=1)).isoformat(),
+        'end_date': (datetime.now(UTC) + timedelta(days=1)).isoformat(),
     }

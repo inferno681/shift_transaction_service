@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -19,7 +19,7 @@ transaction_service = TransactionService()
 )
 def test_create_transaction(transaction_data, time_machine):
     """Тест создания транзакций."""
-    frozen_time = datetime(2024, 7, 23)  # noqa: WPS432
+    frozen_time = datetime(2024, 7, 23, tzinfo=timezone.utc)  # noqa: WPS432
     time_machine.move_to(frozen_time)
     transaction_service.create_transaction(**transaction_data)
     assert len(transaction_storage) == 1
