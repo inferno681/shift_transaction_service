@@ -4,20 +4,26 @@ from decimal import Decimal, getcontext
 from enum import Enum
 from itertools import count
 from typing import Any
+from fastapi import HTTPException, status
 
 from app.constants import (
     CREDIT,
     DEBIT,
     INVALID_DECIMAL_MESSAGE,
-    INVALID_INT_FLOAT_MESSAGE,
     INVALID_INT_MESSAGE,
     INVALID_TRANSACTION_TYPE_MESSAGE,
     WRONG_AMOUNT_MESSAGE,
     WRONG_ID_MESSAGE,
+    USER_NOT_FOUND,
+    DEFAULT_BALANCE,
 )
 
 transaction_storage = []
 report_storage = []
+users = {
+    1: [DEFAULT_BALANCE, True],
+    2: [DEFAULT_BALANCE, False],
+}
 getcontext().prec = 2
 
 
@@ -78,19 +84,45 @@ class TransactionService:
     """Класс с методами для работы с транзакциями."""
 
     @staticmethod
+    def get_balance(user_id: int) -> Decimal:
+        """Получения баланса из хранилища."""
+        balance = users[user_id][0]
+        if balance:
+            return balance
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=USER_NOT_FOUND,
+        )
+
+    @staticmethod
+    def change_balance(
+        user_id: int, amount: Decimal, transaction_type: TransactionType
+    ) -> Decimal:
+        if transaction_type == TransactionType.DEBIT:
+            users[user_id][0] -= amount
+        elif transaction_type == TransactionType.CREDIT:
+            users[user_id][0] += amount
+        return users[user_id][0]
+
+    @staticmethod
     def create_transaction(
         user_id: int,
         amount: int | float,
         transaction_type: TransactionType,
     ) -> Transaction:
         """Создание транзакции и добавление ее в хранилище."""
-        if not isinstance(amount, (int, float)):
-            raise TypeError(INVALID_INT_FLOAT_MESSAGE.format(value=amount))
+        balance = TransactionService.get_balance(user_id)
         transaction = Transaction(
             user_id=user_id,
             amount=Decimal(str(amount)) / Decimal('1.00'),
             transaction_type=transaction_type,
         )
+        if (
+            transaction.ransaction_type == TransactionType.DEBIT
+            and balance - transaction.amount >= 0
+        ):
+            change_balance
+
         transaction_storage.append(transaction)
         return transaction
 
