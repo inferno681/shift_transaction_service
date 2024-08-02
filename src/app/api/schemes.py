@@ -38,12 +38,9 @@ class TransactionReportCreate(BaseModel):
         return self
 
 
-class TransactionReport(BaseModel):
+class TransactionReport(TransactionReportCreate):
     """Схема отчета."""
 
-    user_id: PositiveInt
-    start_date: datetime
-    end_date: datetime
     transactions: list[Transaction] | list
     debit: Decimal
     credit: Decimal

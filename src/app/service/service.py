@@ -16,6 +16,7 @@ from app.constants import (
     WRONG_ID_MESSAGE,
     USER_NOT_FOUND,
     DEFAULT_BALANCE,
+    FORBIDDEN,
 )
 
 transaction_storage = []
@@ -95,14 +96,18 @@ class TransactionService:
         )
 
     @staticmethod
-    def change_balance(
-        user_id: int, amount: Decimal, transaction_type: TransactionType
-    ) -> Decimal:
-        if transaction_type == TransactionType.DEBIT:
-            users[user_id][0] -= amount
-        elif transaction_type == TransactionType.CREDIT:
-            users[user_id][0] += amount
-        return users[user_id][0]
+    def change_balance(transaction: Transaction) -> Decimal:
+        """Изменение баланса пользователя в хранилище."""
+        if transaction.transaction_type == TransactionType.DEBIT:
+            users[transaction.user_id][0] -= transaction.amount
+        elif transaction.transaction_type == TransactionType.CREDIT:
+            users[transaction.user_id][0] += transaction.amount
+        return users[transaction.user_id][0]
+
+    @staticmethod
+    def is_verified(user_id: int) -> bool:
+        """Проверка верификации пользователя."""
+        return users[user_id][1]
 
     @staticmethod
     def create_transaction(
@@ -111,19 +116,23 @@ class TransactionService:
         transaction_type: TransactionType,
     ) -> Transaction:
         """Создание транзакции и добавление ее в хранилище."""
-        balance = TransactionService.get_balance(user_id)
         transaction = Transaction(
             user_id=user_id,
             amount=Decimal(str(amount)) / Decimal('1.00'),
             transaction_type=transaction_type,
         )
+        balance = TransactionService.get_balance(user_id)
         if (
-            transaction.ransaction_type == TransactionType.DEBIT
-            and balance - transaction.amount >= 0
+            transaction.transaction_type == TransactionType.DEBIT
+            and balance - transaction.amount < 0
+            and not TransactionService.is_verified(user_id)
         ):
-            change_balance
-
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=FORBIDDEN,
+            )
         transaction_storage.append(transaction)
+        TransactionService.change_balance(transaction)
         return transaction
 
     @staticmethod
