@@ -5,19 +5,29 @@ from enum import Enum
 from itertools import count
 from typing import Any
 
-from app.constants import (
+from fastapi import HTTPException, status
+
+from app.constants import (  # noqa:WPS235
     CREDIT,
     DEBIT,
+    DEFAULT_BALANCE,
+    FORBIDDEN,
     INVALID_DECIMAL_MESSAGE,
     INVALID_INT_FLOAT_MESSAGE,
     INVALID_INT_MESSAGE,
     INVALID_TRANSACTION_TYPE_MESSAGE,
+    USER_NOT_FOUND,
     WRONG_AMOUNT_MESSAGE,
     WRONG_ID_MESSAGE,
 )
 
 transaction_storage = []
 report_storage = []
+users_dict = dict[int, list[Any]]
+users: users_dict = {
+    1: [DEFAULT_BALANCE, True],
+    2: [DEFAULT_BALANCE, False],
+}
 getcontext().prec = 2
 
 
@@ -78,6 +88,31 @@ class TransactionService:
     """Класс с методами для работы с транзакциями."""
 
     @staticmethod
+    def get_balance(user_id: int) -> Decimal:
+        """Получения баланса из хранилища."""
+        balance = users[user_id][0]
+        if balance:
+            return balance
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=USER_NOT_FOUND,
+        )
+
+    @staticmethod
+    def change_balance(transaction: Transaction) -> Decimal:
+        """Изменение баланса пользователя в хранилище."""
+        if transaction.transaction_type == TransactionType.DEBIT:
+            users[transaction.user_id][0] -= transaction.amount
+        elif transaction.transaction_type == TransactionType.CREDIT:
+            users[transaction.user_id][0] += transaction.amount
+        return users[transaction.user_id][0]
+
+    @staticmethod
+    def is_verified(user_id: int) -> bool:
+        """Проверка верификации пользователя."""
+        return users[user_id][1]
+
+    @staticmethod
     def create_transaction(
         user_id: int,
         amount: int | float,
@@ -91,7 +126,18 @@ class TransactionService:
             amount=Decimal(str(amount)) / Decimal('1.00'),
             transaction_type=transaction_type,
         )
+        balance = TransactionService.get_balance(user_id)
+        if (
+            transaction.transaction_type == TransactionType.DEBIT
+            and balance - transaction.amount < 0
+            and not TransactionService.is_verified(user_id)
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=FORBIDDEN,
+            )
         transaction_storage.append(transaction)
+        TransactionService.change_balance(transaction)
         return transaction
 
     @staticmethod

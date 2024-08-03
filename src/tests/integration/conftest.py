@@ -88,3 +88,13 @@ def report_data():
         'start_date': (datetime.now(UTC) - timedelta(days=1)).isoformat(),
         'end_date': (datetime.now(UTC) + timedelta(days=1)).isoformat(),
     }
+
+
+@pytest.fixture
+def wrong_report_data():
+    """Некорректные данные для запроса отчета."""
+    return {
+        'user_id': USER_ID,
+        'start_date': (datetime.now(UTC) + timedelta(days=1)).isoformat(),
+        'end_date': (datetime.now(UTC) - timedelta(days=1)).isoformat(),
+    }

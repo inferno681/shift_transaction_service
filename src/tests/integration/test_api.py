@@ -2,6 +2,8 @@ from decimal import Decimal
 
 import pytest
 
+from app.constants import INVALID_DATES
+
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
@@ -55,3 +57,20 @@ async def test_create_report(
     assert response.status_code == 200
     response_data = response.json()
     assert len(response_data['transactions']) == 2
+
+
+@pytest.mark.anyio
+async def test_create_report_wrong_dates(
+    client,
+    debit_transaction,
+    credit_transaction,
+    create_report_link,
+    create_transaction_link,
+    wrong_report_data,
+):
+    """Тест создания отчета."""
+    await client.post(create_transaction_link, json=debit_transaction)
+    await client.post(create_transaction_link, json=credit_transaction)
+    response = await client.post(create_report_link, json=wrong_report_data)
+    assert response.status_code == 400
+    assert response.json()['detail'] == INVALID_DATES
