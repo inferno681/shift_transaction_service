@@ -4,24 +4,27 @@ from decimal import Decimal, getcontext
 from enum import Enum
 from itertools import count
 from typing import Any
+
 from fastapi import HTTPException, status
 
-from app.constants import (
+from app.constants import (  # noqa:WPS235
     CREDIT,
     DEBIT,
-    INVALID_DECIMAL_MESSAGE,
-    INVALID_INT_MESSAGE,
-    INVALID_TRANSACTION_TYPE_MESSAGE,
-    WRONG_AMOUNT_MESSAGE,
-    WRONG_ID_MESSAGE,
-    USER_NOT_FOUND,
     DEFAULT_BALANCE,
     FORBIDDEN,
+    INVALID_DECIMAL_MESSAGE,
+    INVALID_INT_FLOAT_MESSAGE,
+    INVALID_INT_MESSAGE,
+    INVALID_TRANSACTION_TYPE_MESSAGE,
+    USER_NOT_FOUND,
+    WRONG_AMOUNT_MESSAGE,
+    WRONG_ID_MESSAGE,
 )
 
 transaction_storage = []
 report_storage = []
-users = {
+users_dict = dict[int, list[Any]]
+users: users_dict = {
     1: [DEFAULT_BALANCE, True],
     2: [DEFAULT_BALANCE, False],
 }
@@ -116,6 +119,8 @@ class TransactionService:
         transaction_type: TransactionType,
     ) -> Transaction:
         """Создание транзакции и добавление ее в хранилище."""
+        if not isinstance(amount, (int, float)):
+            raise TypeError(INVALID_INT_FLOAT_MESSAGE.format(value=amount))
         transaction = Transaction(
             user_id=user_id,
             amount=Decimal(str(amount)) / Decimal('1.00'),

@@ -7,7 +7,8 @@ DEBIT = 'списание'
 TRANSACTIONS = 'Транзакции'
 
 """Значения по умолчанию."""
-DEFAULT_BALANCE = Decimal(500)
+DEFAULT_BALANCE = Decimal('500.00')
+
 """Ошибки типов и значений."""
 INVALID_INT_MESSAGE = 'Значение {value} не соответствует типу int'
 INVALID_INT_FLOAT_MESSAGE = (
