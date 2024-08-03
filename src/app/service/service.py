@@ -91,7 +91,7 @@ class TransactionService:
     def get_balance(user_id: int) -> Decimal:
         """Получения баланса из хранилища."""
         balance = users[user_id][0]
-        if balance:
+        if balance or balance == 0:
             return balance
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
