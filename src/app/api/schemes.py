@@ -1,11 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
+from fastapi import HTTPException, status
 
 from pydantic import (
     BaseModel,
     PositiveFloat,
     PositiveInt,
-    ValidationError,
     model_validator,
 )
 
@@ -34,7 +34,10 @@ class TransactionReportCreate(BaseModel):
         start_date = self.start_date
         end_date = self.end_date
         if start_date and end_date and start_date > end_date:
-            raise ValidationError(INVALID_DATES)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=INVALID_DATES,
+            )
         return self
 
 
