@@ -47,4 +47,4 @@ class Settings(_SettingsModel):
     service: _ServiceSettings
 
 
-config = Settings.from_yaml('./src/config/config.yaml')
+config = Settings.from_yaml('./config/config.yaml')
