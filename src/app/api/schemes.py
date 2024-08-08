@@ -42,3 +42,9 @@ class TransactionReport(TransactionReportCreate):
     transactions: list[Transaction] | list
     debit: Decimal
     credit: Decimal
+
+
+class IsReady(BaseModel):
+    """Схема ответа health check."""
+
+    is_ready: bool

@@ -74,3 +74,11 @@ async def test_create_report_wrong_dates(
     response = await client.post(create_report_link, json=wrong_report_data)
     assert response.status_code == 400
     assert response.json()['detail'] == INVALID_DATES
+
+
+@pytest.mark.anyio
+async def test_check_healthz(client, check_health_link):
+    """Тест проверки запущени ли сервис."""
+    response = await client.get(check_health_link)
+    assert response.status_code == 200
+    assert response.json()['is_ready'] is True

@@ -98,3 +98,9 @@ def wrong_report_data():
         'start_date': (datetime.now(UTC) + timedelta(days=1)).isoformat(),
         'end_date': (datetime.now(UTC) - timedelta(days=1)).isoformat(),
     }
+
+
+@pytest.fixture
+def check_health_link():
+    """Фикстура со ссылкой на проверку готовности сервиса."""
+    return '/healthz/ready'

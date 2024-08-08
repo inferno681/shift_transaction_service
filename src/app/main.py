@@ -4,7 +4,10 @@ from fastapi import FastAPI
 from app.api import router
 from config import config
 
-tags_metadata = [config.service.tags_metadata]  # type: ignore
+tags_metadata = [
+    config.service.tags_metadata_transaction,  # type: ignore
+    config.service.tags_metadata_health,  # type: ignore
+]  # type: ignore
 app = FastAPI(
     title=config.service.title,  # type: ignore
     description=config.service.description,  # type: ignore
@@ -15,7 +18,6 @@ app = FastAPI(
 app.include_router(
     router,
     prefix='/api',
-    tags=[config.service.tags_metadata['name']],  # type: ignore
 )
 
 
