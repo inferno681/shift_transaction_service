@@ -8,6 +8,8 @@ from typing import Any
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from app.db import User, Transaction, TransactionType
+from app.db import Transaction as dbTransaction
 
 from app.constants import (  # noqa:WPS235
     CREDIT,
@@ -33,13 +35,6 @@ users: users_dict = {
 getcontext().prec = 2
 
 
-class TransactionType(Enum):
-    """Типы транзакций."""
-
-    DEBIT = DEBIT  # noqa: WPS115
-    CREDIT = CREDIT  # noqa: WPS115
-
-
 _id_counter = count(1)
 
 
@@ -49,7 +44,7 @@ class Transaction:
 
     id: int = field(default_factory=lambda: next(_id_counter), init=False)
     user_id: int
-    amount: Decimal
+    amount: int
     transaction_type: TransactionType
     created_at: datetime = field(
         init=False,
@@ -71,7 +66,7 @@ class Transaction:
 
     def _validate_amount(self):
         """Проверка корректности суммы транзакции."""
-        if not isinstance(self.amount, Decimal):
+        if not isinstance(self.amount, int):
             raise TypeError(INVALID_DECIMAL_MESSAGE.format(value=self.amount))
         if self.amount < 0:
             raise ValueError(WRONG_AMOUNT_MESSAGE)
@@ -90,15 +85,15 @@ class TransactionService:
     """Класс с методами для работы с транзакциями."""
 
     @staticmethod
-    def get_balance(user_id: int) -> Decimal:
+    async def get_balance(user_id: int, session: AsyncSession) -> int:
         """Получения баланса из хранилища."""
-        balance = users[user_id][0]
-        if balance or balance == 0:
-            return balance
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=USER_NOT_FOUND,
-        )
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=USER_NOT_FOUND,
+            )
+        return user.balance
 
     @staticmethod
     def change_balance(transaction: Transaction) -> Decimal:
@@ -115,31 +110,35 @@ class TransactionService:
         return users[user_id][1]
 
     @staticmethod
-    def create_transaction(
+    async def create_transaction(
         user_id: int,
-        amount: int | float,
+        amount: int,
         transaction_type: TransactionType,
-    ) -> Transaction:
+        session: AsyncSession,
+    ) -> dbTransaction:
         """Создание транзакции и добавление ее в хранилище."""
-        if not isinstance(amount, (int, float)):
-            raise TypeError(INVALID_INT_FLOAT_MESSAGE.format(value=amount))
-        transaction = Transaction(
-            user_id=user_id,
-            amount=Decimal(str(amount)) / Decimal('1.00'),
-            transaction_type=transaction_type,
-        )
-        balance = TransactionService.get_balance(user_id)
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=USER_NOT_FOUND,
+            )
         if (
-            transaction.transaction_type == TransactionType.DEBIT
-            and balance - transaction.amount < 0
-            and not TransactionService.is_verified(user_id)
+            transaction_type == TransactionType.debit
+            and user.balance - amount < 0
+            and not user.is_verified
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=FORBIDDEN,
             )
-        transaction_storage.append(transaction)
-        TransactionService.change_balance(transaction)
+        transaction = dbTransaction(
+            user_id=user_id,
+            amount=amount,
+            transaction_type=transaction_type,
+        )
+        session.add(transaction)
+        await session.commit()
         return transaction
 
     @staticmethod

@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from sqlalchemy.ext.automap import automap_base
 from typing import Annotated
 
 from pydantic import PositiveInt
@@ -8,12 +9,18 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.constants import CREDIT, DEBIT
 from app.db.basemodels import Base
+from app.db import sync_engine
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 intfk_user = Annotated[
     int,
     mapped_column(ForeignKey('user.id', ondelete='CASCADE')),
 ]
+AutomapBase = automap_base()
+AutomapBase.prepare(sync_engine, reflect=True)
+User = AutomapBase.classes.user
+
+User.transactions = relationship('Transaction', back_populates='user')
 
 
 class TransactionType(Enum):
@@ -48,6 +55,7 @@ class Transaction(Base):
     created_at: Mapped[datetime] = mapped_column(
         server_default=text("TIMEZONE('utc', now())"),
     )
+    user: Mapped['User'] = relationship(back_populates='transaction')
 
 
 class Report(Base):

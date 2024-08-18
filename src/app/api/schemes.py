@@ -16,6 +16,13 @@ class TransactionCreate(BaseModel):
     transaction_type: TransactionType
 
 
+class TransactionRead(TransactionCreate):
+    """Схема чтения транзакции."""
+
+    id: PositiveInt
+    created_at: datetime
+
+
 class TransactionReportCreate(BaseModel):
     """Схема создания отчета."""
 
