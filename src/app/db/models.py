@@ -46,7 +46,7 @@ class Transaction(Base):
     amount: Mapped[PositiveInt]
     transaction_type: Mapped[TransactionType]
     created_at: Mapped[datetime] = mapped_column(
-        server_default=text('TIMEZONE("utc", now())'),
+        server_default=text("TIMEZONE('utc', now())"),
     )
 
 
@@ -59,4 +59,7 @@ class Report(Base):
     end_date: Mapped[datetime]
     debit: Mapped[PositiveInt]
     credit: Mapped[PositiveInt]
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=text("TIMEZONE('utc', now())"),
+    )
     transaction: Mapped[list[ReportTransaction]] = relationship()

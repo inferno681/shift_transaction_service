@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: b9b276be0e05
+Revision ID: 7a52aeb252b8
 Revises:
-Create Date: 2024-08-18 04:05:15.485176
+Create Date: 2024-08-18 04:38:04.592195
 
 """
 
@@ -13,7 +13,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'b9b276be0e05'
+revision: str = '7a52aeb252b8'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,6 +30,12 @@ def upgrade() -> None:
         sa.Column('end_date', sa.DateTime(), nullable=False),
         sa.Column('debit', sa.Integer(), nullable=False),
         sa.Column('credit', sa.Integer(), nullable=False),
+        sa.Column(
+            'created_at',
+            sa.DateTime(),
+            server_default=sa.text("TIMEZONE('utc', now())"),
+            nullable=False,
+        ),
         sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
     )
@@ -51,7 +57,7 @@ def upgrade() -> None:
         sa.Column(
             'created_at',
             sa.DateTime(),
-            server_default=sa.text('TIMEZONE("utc", now())'),
+            server_default=sa.text("TIMEZONE('utc', now())"),
             nullable=False,
         ),
         sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
@@ -62,9 +68,7 @@ def upgrade() -> None:
         sa.Column('report_id', sa.Integer(), nullable=False),
         sa.Column('transaction_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ['report_id'],
-            ['report.id'],
-            ondelete='CASCADE',
+            ['report_id'], ['report.id'], ondelete='CASCADE'
         ),
         sa.ForeignKeyConstraint(
             ['transaction_id'],

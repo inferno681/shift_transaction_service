@@ -6,6 +6,8 @@ from itertools import count
 from typing import Any
 
 from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from app.constants import (  # noqa:WPS235
     CREDIT,

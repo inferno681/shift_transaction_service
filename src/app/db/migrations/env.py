@@ -18,7 +18,7 @@ if config.config_file_name is not None:
 
 config.set_main_option(
     'sqlalchemy.url',
-    conf.database_url + '?async_fallback=True',
+    conf.database_url + '?async_fallback=True',  # type: ignore
 )
 
 
@@ -84,7 +84,7 @@ def run_migrations_online() -> None:
             connection=connection,
             target_metadata=target_metadata,
             compare_server_default=True,
-            version_table='transaction_service_alembic',
+            version_table='transaction_service_version',
         )
 
         with context.begin_transaction():
