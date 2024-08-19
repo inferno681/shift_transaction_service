@@ -1,11 +1,10 @@
 from datetime import datetime
-from decimal import Decimal
 
 from fastapi import HTTPException, status
 from pydantic import BaseModel, PositiveFloat, PositiveInt, model_validator
 
 from app.constants import INVALID_DATES
-from app.service import Transaction, TransactionType
+from app.service import TransactionType
 
 
 class TransactionCreate(BaseModel):
@@ -46,9 +45,9 @@ class TransactionReportCreate(BaseModel):
 class TransactionReport(TransactionReportCreate):
     """Схема отчета."""
 
-    transactions: list[Transaction] | list
-    debit: Decimal
-    credit: Decimal
+    transactions: list[TransactionRead | None]
+    debit: int
+    credit: int
 
 
 class IsReady(BaseModel):

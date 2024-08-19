@@ -1,113 +1,17 @@
-from dataclasses import dataclass, field
-from datetime import UTC, datetime
-from decimal import Decimal, getcontext
-from enum import Enum
-from itertools import count
+from datetime import datetime
 from typing import Any
 
 from fastapi import HTTPException, status
+from sqlalchemy import and_, case, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.db import User, Transaction, TransactionType
-from app.db import Transaction as dbTransaction
 
-from app.constants import (  # noqa:WPS235
-    CREDIT,
-    DEBIT,
-    DEFAULT_BALANCE,
-    FORBIDDEN,
-    INVALID_DECIMAL_MESSAGE,
-    INVALID_INT_FLOAT_MESSAGE,
-    INVALID_INT_MESSAGE,
-    INVALID_TRANSACTION_TYPE_MESSAGE,
-    USER_NOT_FOUND,
-    WRONG_AMOUNT_MESSAGE,
-    WRONG_ID_MESSAGE,
-)
-
-transaction_storage = []
-report_storage = []
-users_dict = dict[int, list[Any]]
-users: users_dict = {
-    1: [DEFAULT_BALANCE, True],
-    2: [DEFAULT_BALANCE, False],
-}
-getcontext().prec = 2
-
-
-_id_counter = count(1)
-
-
-@dataclass(frozen=True)
-class Transaction:
-    """Класс транзакции."""
-
-    id: int = field(default_factory=lambda: next(_id_counter), init=False)
-    user_id: int
-    amount: int
-    transaction_type: TransactionType
-    created_at: datetime = field(
-        init=False,
-        default_factory=lambda: datetime.now(UTC),
-    )
-
-    def __post_init__(self):
-        """Проверка типов и значений."""
-        self._validate_user_id()
-        self._validate_amount()
-        self._validate_transaction_type()
-
-    def _validate_user_id(self):
-        """Проверка корректности идентификатора пользователя."""
-        if not isinstance(self.user_id, int):
-            raise TypeError(INVALID_INT_MESSAGE.format(value=self.user_id))
-        if self.user_id <= 0:
-            raise ValueError(WRONG_ID_MESSAGE)
-
-    def _validate_amount(self):
-        """Проверка корректности суммы транзакции."""
-        if not isinstance(self.amount, int):
-            raise TypeError(INVALID_DECIMAL_MESSAGE.format(value=self.amount))
-        if self.amount < 0:
-            raise ValueError(WRONG_AMOUNT_MESSAGE)
-
-    def _validate_transaction_type(self):
-        """Проверка корректности типа транзакции."""
-        if not isinstance(self.transaction_type, TransactionType):
-            raise TypeError(
-                INVALID_TRANSACTION_TYPE_MESSAGE.format(
-                    value=self.transaction_type,
-                ),
-            )
+from app.constants import FORBIDDEN, USER_NOT_FOUND
+from app.db import Transaction, TransactionType, User
 
 
 class TransactionService:
     """Класс с методами для работы с транзакциями."""
-
-    @staticmethod
-    async def get_balance(user_id: int, session: AsyncSession) -> int:
-        """Получения баланса из хранилища."""
-        user = await session.get(User, user_id)
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=USER_NOT_FOUND,
-            )
-        return user.balance
-
-    @staticmethod
-    def change_balance(transaction: Transaction) -> Decimal:
-        """Изменение баланса пользователя в хранилище."""
-        if transaction.transaction_type == TransactionType.DEBIT:
-            users[transaction.user_id][0] -= transaction.amount
-        elif transaction.transaction_type == TransactionType.CREDIT:
-            users[transaction.user_id][0] += transaction.amount
-        return users[transaction.user_id][0]
-
-    @staticmethod
-    def is_verified(user_id: int) -> bool:
-        """Проверка верификации пользователя."""
-        return users[user_id][1]
 
     @staticmethod
     async def create_transaction(
@@ -115,7 +19,7 @@ class TransactionService:
         amount: int,
         transaction_type: TransactionType,
         session: AsyncSession,
-    ) -> dbTransaction:
+    ) -> Transaction:
         """Создание транзакции и добавление ее в хранилище."""
         user = await session.get(User, user_id)
         if not user:
@@ -125,14 +29,14 @@ class TransactionService:
             )
         if (
             transaction_type == TransactionType.debit
-            and user.balance - amount < 0
-            and not user.is_verified
+            and user.balance - amount < 0  # type: ignore
+            and not user.is_verified  # type: ignore
         ):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=FORBIDDEN,
             )
-        transaction = dbTransaction(
+        transaction = Transaction(
             user_id=user_id,
             amount=amount,
             transaction_type=transaction_type,
@@ -142,33 +46,56 @@ class TransactionService:
         return transaction
 
     @staticmethod
-    def create_report(
+    async def create_report(
         user_id: int,
         start_date: datetime,
         end_date: datetime,
+        session: AsyncSession,
     ) -> dict[str, Any]:
         """Формирование отчета по транзакциям пользователя."""
-        transactions = [
-            transaction
-            for transaction in transaction_storage
-            if transaction.user_id == user_id
-            and start_date <= transaction.created_at <= end_date
-        ]
-        report = {
+        query_result = await session.execute(
+            select(
+                Transaction,
+                func.sum(
+                    case(
+                        (
+                            Transaction.transaction_type == 'debit',
+                            Transaction.amount,
+                        ),
+                        else_=0,
+                    ),
+                ).label('debit'),
+                func.sum(
+                    case(
+                        (
+                            Transaction.transaction_type == 'credit',
+                            Transaction.amount,
+                        ),
+                        else_=0,
+                    ),
+                ).label('credit'),
+            )
+            .where(
+                and_(
+                    Transaction.user_id == user_id,
+                    Transaction.created_at >= start_date,
+                    Transaction.created_at <= end_date,
+                ),
+            )
+            .group_by(Transaction),  # type: ignore
+        )
+        transactions = []
+        total_debit = 0
+        total_credit = 0
+        for transaction, debit, credit in query_result.fetchall():
+            transactions.append(transaction)
+            total_debit += debit
+            total_credit += credit
+        return {
             'user_id': user_id,
             'start_date': start_date,
             'end_date': end_date,
             'transactions': transactions,
-            'debit': sum(
-                transaction.amount
-                for transaction in transactions
-                if transaction.transaction_type == TransactionType.DEBIT
-            ),
-            'credit': sum(
-                transaction.amount
-                for transaction in transactions
-                if transaction.transaction_type == TransactionType.CREDIT
-            ),
+            'debit': total_debit,
+            'credit': total_credit,
         }
-        report_storage.append(report)
-        return report
