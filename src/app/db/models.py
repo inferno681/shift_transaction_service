@@ -4,6 +4,7 @@ from typing import Annotated
 
 from pydantic import PositiveInt
 from sqlalchemy import ForeignKey, text
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.constants import CREDIT, DEBIT
@@ -15,7 +16,14 @@ intfk_user = Annotated[
     int,
     mapped_column(ForeignKey('user.id', ondelete='CASCADE')),
 ]
-
+datetime_field = Annotated[datetime, mapped_column(TIMESTAMP(timezone=True))]
+datetime_field_default = Annotated[
+    datetime,
+    mapped_column(
+        TIMESTAMP(timezone=True),
+        server_default=text("TIMEZONE('utc', now())"),
+    ),
+]
 
 Base.metadata.reflect(sync_engine, only=['user'])
 
@@ -24,7 +32,8 @@ class User(Base):
     """Модель пользователя."""
 
     __table__ = Base.metadata.tables['user']
-    transaction: Mapped['Transaction'] = relationship(back_populates='user')
+    transactions: Mapped['Transaction'] = relationship(back_populates='user')
+    report: Mapped['Report'] = relationship(back_populates='user')
 
 
 class TransactionType(Enum):
@@ -56,10 +65,13 @@ class Transaction(Base):
     user_id: Mapped[intfk_user]
     amount: Mapped[PositiveInt]
     transaction_type: Mapped[TransactionType]
-    created_at: Mapped[datetime] = mapped_column(
-        server_default=text("TIMEZONE('utc', now())"),
+    created_at: Mapped[datetime_field_default]
+    user: Mapped['User'] = relationship('User', back_populates='transactions')
+    reports: Mapped[list['Report']] = relationship(
+        secondary='report_transaction',
+        back_populates='transactions',
+        overlaps='transaction',
     )
-    user: Mapped['User'] = relationship('User', back_populates='transaction')
 
 
 class Report(Base):
@@ -67,11 +79,14 @@ class Report(Base):
 
     id: Mapped[intpk]
     user_id: Mapped[intfk_user]
-    start_date: Mapped[datetime]
-    end_date: Mapped[datetime]
+    start_date: Mapped[datetime_field]
+    end_date: Mapped[datetime_field]
     debit: Mapped[PositiveInt]
     credit: Mapped[PositiveInt]
-    created_at: Mapped[datetime] = mapped_column(
-        server_default=text("TIMEZONE('utc', now())"),
+    created_at: Mapped[datetime_field_default]
+    transactions: Mapped[list[Transaction]] = relationship(
+        secondary='report_transaction',
+        back_populates='reports',
+        overlaps='transaction',
     )
-    transaction: Mapped[list[ReportTransaction]] = relationship()
+    user: Mapped['User'] = relationship('User', back_populates='report')

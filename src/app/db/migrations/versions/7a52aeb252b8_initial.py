@@ -26,13 +26,21 @@ def upgrade() -> None:
         'report',
         sa.Column('id', sa.Integer(), nullable=False, primary_key=True),
         sa.Column('user_id', sa.INTEGER(), nullable=False),
-        sa.Column('start_date', sa.DateTime(), nullable=False),
-        sa.Column('end_date', sa.DateTime(), nullable=False),
+        sa.Column(
+            'start_date',
+            postgresql.TIMESTAMP(timezone=True),
+            nullable=False,
+        ),
+        sa.Column(
+            'end_date',
+            postgresql.TIMESTAMP(timezone=True),
+            nullable=False,
+        ),
         sa.Column('debit', sa.Integer(), nullable=False),
         sa.Column('credit', sa.Integer(), nullable=False),
         sa.Column(
             'created_at',
-            sa.DateTime(),
+            postgresql.TIMESTAMP(timezone=True),
             server_default=sa.text("TIMEZONE('utc', now())"),
             nullable=False,
         ),
@@ -56,7 +64,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             'created_at',
-            sa.DateTime(),
+            postgresql.TIMESTAMP(timezone=True),
             server_default=sa.text("TIMEZONE('utc', now())"),
             nullable=False,
         ),

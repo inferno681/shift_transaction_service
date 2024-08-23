@@ -1,7 +1,13 @@
 from datetime import datetime
 
 from fastapi import HTTPException, status
-from pydantic import BaseModel, PositiveFloat, PositiveInt, model_validator
+from pydantic import (
+    BaseModel,
+    Field,
+    PositiveFloat,
+    PositiveInt,
+    model_validator,
+)
 
 from app.constants import INVALID_DATES
 from app.service import TransactionType
@@ -20,6 +26,12 @@ class TransactionRead(TransactionCreate):
 
     id: PositiveInt
     created_at: datetime
+
+
+class TransactionInReport(TransactionRead):
+    """Схема чтения транзакции."""
+
+    user_id: PositiveInt = Field(exclude=True)
 
 
 class TransactionReportCreate(BaseModel):
@@ -45,7 +57,7 @@ class TransactionReportCreate(BaseModel):
 class TransactionReport(TransactionReportCreate):
     """Схема отчета."""
 
-    transactions: list[TransactionRead | None]
+    transactions: list[TransactionInReport | None]
     debit: int
     credit: int
 

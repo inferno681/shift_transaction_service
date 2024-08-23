@@ -5,9 +5,10 @@ from fastapi import HTTPException, status
 from sqlalchemy import and_, case, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 
 from app.constants import FORBIDDEN, USER_NOT_FOUND
-from app.db import Transaction, TransactionType, User
+from app.db import Report, Transaction, TransactionType, User
 
 
 class TransactionService:
@@ -53,6 +54,19 @@ class TransactionService:
         session: AsyncSession,
     ) -> dict[str, Any]:
         """Формирование отчета по транзакциям пользователя."""
+        report_search_result = await session.execute(
+            select(Report)
+            .options(joinedload(Report.transactions))
+            .where(
+                Report.user_id == user_id,
+                Report.start_date == start_date,
+                Report.end_date == end_date,
+            ),
+        )
+        report = report_search_result.unique().scalar_one_or_none()
+        if report:
+            return report.__dict__
+
         query_result = await session.execute(
             select(
                 Transaction,
@@ -91,7 +105,7 @@ class TransactionService:
             transactions.append(transaction)
             total_debit += debit
             total_credit += credit
-        return {
+        report_data = {
             'user_id': user_id,
             'start_date': start_date,
             'end_date': end_date,
@@ -99,3 +113,20 @@ class TransactionService:
             'debit': total_debit,
             'credit': total_credit,
         }
+        await TransactionService.insert_report_data(
+            report_data,
+            session,
+            transactions,
+        )
+        return report_data
+
+    @staticmethod
+    async def insert_report_data(
+        report_data: dict,
+        session: AsyncSession,
+        transactions,
+    ) -> None:
+        """Вставка данных отчета в таблицу."""
+        report = Report(**report_data)
+        session.add(report)
+        await session.commit()
