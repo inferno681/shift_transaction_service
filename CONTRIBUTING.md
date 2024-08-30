@@ -81,6 +81,6 @@ kubectl apply -f ./kuber/<filename>.yaml
 - Выполните следующую команду:
 
 ```bash
-helm install <prefix> ./auth-service-chart
+helm install <prefix> ./transaction-service-chart
 ```
 </details>
