@@ -40,6 +40,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
+    lifespan=lifespan,
     title=config.service.title,  # type: ignore
     description=config.service.description,  # type: ignore
     tags_metadata=tags_metadata,
