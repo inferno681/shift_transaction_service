@@ -94,7 +94,7 @@ app:
           name: "Health"
           description: "Проверка доступности сервиса"
       jaeger:
-        service_name: "transaction_service"
+        service_name: "stakrotckii_transaction_service"
         host: "infra-jaeger-agent"
         port: 5775
         logging: True
