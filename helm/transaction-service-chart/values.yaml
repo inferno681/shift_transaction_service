@@ -95,8 +95,8 @@ app:
           description: "Проверка доступности сервиса"
       jaeger:
         service_name: "transaction_service"
-        host: "jaeger-query-service"
-        port: 6831
+        host: "infra-jaeger-agent"
+        port: 5775
         logging: True
         sampler_type: "const"
         sampler_param: 1
