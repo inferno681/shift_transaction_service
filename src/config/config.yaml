@@ -17,8 +17,8 @@ service:
     description: "Проверка доступности сервиса"
 
 jaeger:
-  service_name: "gateway"
-  host: "localhost"
+  service_name: "transaction_service"
+  host: "jaeger"
   port: 6831
   logging: True
   sampler_type: "const"
