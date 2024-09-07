@@ -1,4 +1,5 @@
 import pytest
+from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -62,8 +63,9 @@ async def client():
     """Фикстура клиента."""
     from app.main import app
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url='http://127.0.0.1:8000/api/',
-    ) as client:
-        yield client
+    async with LifespanManager(app):
+        async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url='http://127.0.0.1:8000/api/',
+        ) as client:
+            yield client

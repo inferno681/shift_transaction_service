@@ -29,6 +29,7 @@ wemake-python-styleguide = "^0.19.2"
 time-machine = "^2.14.2"
 types-pyyaml = "^6.0.12.20240724"
 types-opentracing = "^2.4.10.6"
+asgi-lifespan = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core"]
