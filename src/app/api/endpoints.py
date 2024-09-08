@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from opentracing import global_tracer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,6 +33,7 @@ async def create_transaction(
 @router_transaction.post('/create_report', response_model=TransactionReport)
 async def create_report(
     report_request: TransactionReportCreate,
+    request: Request,
     session: AsyncSession = Depends(get_async_session),
 ):
     """Эндпоинт создания транзакции."""
@@ -41,6 +42,7 @@ async def create_report(
         return await TransactionService.create_report(
             **report_request.model_dump(),
             session=session,
+            redis=request.app.state.redis,
         )
 
 

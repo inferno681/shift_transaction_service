@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -10,9 +11,12 @@ from opentracing import (
     propagation,
     tags,
 )
+from redis.asyncio import Redis
 
 from app.api import router
 from config import config
+
+log = logging.getLogger('uvicorn')
 
 tags_metadata = [
     config.service.tags_metadata_transaction,  # type: ignore
@@ -40,9 +44,23 @@ async def lifespan(app: FastAPI):
     )
     tracer = tracer_config.initialize_tracer()
     app.state.jaeger_tracer = tracer
+    log.info('Tracer started')
+
+    redis = await Redis.from_url(
+        config.redis.url,  # type: ignore
+        db=config.redis.db,  # type: ignore
+        decode_responses=config.redis.decode_responses,  # type: ignore
+    )
+    app.state.redis = redis
+    log.info('Redis client initialized')
+
     yield
     if tracer:
         tracer.close()
+        log.info('Tracer client closed')
+
+    await redis.aclose()
+    log.info('Redis client closed')
 
 
 app = FastAPI(

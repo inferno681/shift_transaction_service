@@ -4,7 +4,7 @@ service:
   host: "0.0.0.0"
   port: 8000
   debug: True
-  db_hostname: "db"
+  db_hostname: "localhost"
   db_port: 5432
   db_name: postgres
   db_username: postgres
@@ -23,3 +23,8 @@ jaeger:
   logging: True
   sampler_type: "const"
   sampler_param: 1
+
+redis:
+  url: "redis://localhost:6379"
+  db: 1
+  decode_responses: True
