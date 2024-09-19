@@ -1,11 +1,10 @@
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
 
-from app.constants import CREDIT, DEBIT, TRANSACTIONS
 from app.service import TransactionService, report_storage, transaction_storage
-from tests.conftest import USER_ID
+from tests.unit.service.conftest import USER_ID
 
 transaction_service = TransactionService()
 
@@ -18,8 +17,10 @@ transaction_service = TransactionService()
     ],
     indirect=True,
 )
-def test_create_transaction(transaction_data):
+def test_create_transaction(transaction_data, time_machine):
     """Тест создания транзакций."""
+    frozen_time = datetime(2024, 7, 23, tzinfo=timezone.utc)  # noqa: WPS432
+    time_machine.move_to(frozen_time)
     transaction_service.create_transaction(**transaction_data)
     assert len(transaction_storage) == 1
     assert transaction_storage[0].user_id == transaction_data['user_id']
@@ -30,6 +31,7 @@ def test_create_transaction(transaction_data):
         transaction_storage[0].transaction_type
         == transaction_data['transaction_type']
     )
+    assert transaction_storage[0].created_at == frozen_time
 
 
 def test_create_report(debit_transaction, credit_transaction):
@@ -42,11 +44,11 @@ def test_create_report(debit_transaction, credit_transaction):
         end_date=(transaction.created_at + timedelta(days=1)),
     )
     assert len(report_storage) == 1
-    assert len(report_storage[0][TRANSACTIONS]) == 2
-    assert report_storage[0][DEBIT] == Decimal(
+    assert len(report_storage[0]['transactions']) == 2
+    assert report_storage[0]['debit'] == Decimal(
         debit_transaction['amount'],
     ) / Decimal('1.00')
-    assert report_storage[0][CREDIT] == Decimal(
+    assert report_storage[0]['credit'] == Decimal(
         credit_transaction['amount'],
     ) / Decimal('1.00')
 

@@ -6,11 +6,16 @@
             "label": "Flake8",
             "type": "shell",
             "command": "poetry run flake8 --jobs=1 src/app",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
         },
         {
             "label": "ISort",
             "type": "shell",
-            "command": "poetry run isort src/app",
+            "command": "poetry run isort src/app"
         }
     ]
 }

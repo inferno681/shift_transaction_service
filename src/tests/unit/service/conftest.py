@@ -43,7 +43,7 @@ def credit_transaction():
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def transaction_data(request, debit_transaction, credit_transaction):
     """Фикстура подстановки транзакций списания и пополнения."""
     if request.param == 'debit':
@@ -76,7 +76,7 @@ def transaction_data(request, debit_transaction, credit_transaction):
         },
         {
             'data': {
-                'user_id': 123,
+                'user_id': USER_ID,
                 'amount': -100,
                 'transaction_type': TransactionType.DEBIT,
             },
@@ -84,7 +84,7 @@ def transaction_data(request, debit_transaction, credit_transaction):
         },
         {
             'data': {
-                'user_id': 123,
+                'user_id': USER_ID,
                 'amount': WRONG_VALUE,
                 'transaction_type': TransactionType.DEBIT,
             },
@@ -94,7 +94,7 @@ def transaction_data(request, debit_transaction, credit_transaction):
         },
         {
             'data': {
-                'user_id': 123,
+                'user_id': USER_ID,
                 'amount': 100,
                 'transaction_type': WRONG_VALUE,
             },

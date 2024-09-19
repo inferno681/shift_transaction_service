@@ -34,6 +34,10 @@ pip install poetry
 ```bash
 poetry install
 ```
+- Для запуска API выполните команду:
+```bash
+python src/app/main.py
+```
 
 </details>
 
