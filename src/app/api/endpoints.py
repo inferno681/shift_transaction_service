@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from opentracing import global_tracer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemes import (
@@ -21,10 +22,12 @@ async def create_transaction(
     session: AsyncSession = Depends(get_async_session),
 ):
     """Эндпоинт создания транзакции."""
-    return await TransactionService.create_transaction(
-        **transaction.model_dump(),
-        session=session,
-    )
+    with global_tracer().start_active_span('create_transaction') as scope:
+        scope.span.set_tag('transaction', str(transaction))
+        return await TransactionService.create_transaction(
+            **transaction.model_dump(),
+            session=session,
+        )
 
 
 @router_transaction.post('/create_report', response_model=TransactionReport)
@@ -33,10 +36,12 @@ async def create_report(
     session: AsyncSession = Depends(get_async_session),
 ):
     """Эндпоинт создания транзакции."""
-    return await TransactionService.create_report(
-        **report_request.model_dump(),
-        session=session,
-    )
+    with global_tracer().start_active_span('create_report') as scope:
+        scope.span.set_tag('report_request', str(report_request))
+        return await TransactionService.create_report(
+            **report_request.model_dump(),
+            session=session,
+        )
 
 
 @router_healthz.get('/healthz/ready', response_model=IsReady)
