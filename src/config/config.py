@@ -38,7 +38,8 @@ class _ServiceSettings(_SettingsModel):
     host: str
     port: int
     debug: bool
-    tags_metadata: dict[str, str]
+    tags_metadata_transaction: dict[str, str]
+    tags_metadata_health: dict[str, str]
 
 
 class Settings(_SettingsModel):
