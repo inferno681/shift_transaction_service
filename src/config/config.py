@@ -70,11 +70,20 @@ class _JaegerSettings(_SettingsModel):
     sampler_param: float | int
 
 
+class _RedisSettings(_SettingsModel):
+    """Валидация настроек настроек redis."""
+
+    url: str
+    db: int
+    decode_responses: bool
+
+
 class Settings(_SettingsModel, _SettingsSecret):
     """Настройки сервиса."""
 
     service: _ServiceSettings
     jaeger: _JaegerSettings
+    redis: _RedisSettings
 
     @property
     def database_url(self):

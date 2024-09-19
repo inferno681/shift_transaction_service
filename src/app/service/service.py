@@ -1,7 +1,9 @@
+import json
 from datetime import datetime
 from typing import Any
 
 from fastapi import HTTPException, status
+from redis.asyncio import Redis
 from sqlalchemy import and_, case, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -9,6 +11,14 @@ from sqlalchemy.orm import joinedload
 
 from app.constants import FORBIDDEN, USER_NOT_FOUND
 from app.db import Report, Transaction, TransactionType, User
+
+
+def data_converter_dumps(obj: Any):
+    """Функция ковертации данных для json.dumps()."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, Transaction):
+        return obj.to_dict()
 
 
 class TransactionService:
@@ -52,8 +62,14 @@ class TransactionService:
         start_date: datetime,
         end_date: datetime,
         session: AsyncSession,
+        redis: Redis,
     ) -> dict[str, Any]:
         """Формирование отчета по транзакциям пользователя."""
+        key = f'{user_id}:{start_date}:{end_date}'
+        redis_result = await redis.get(key)
+        if redis_result:
+            return json.loads(redis_result)
+
         report_search_result = await session.execute(
             select(Report)
             .options(joinedload(Report.transactions))
@@ -116,15 +132,19 @@ class TransactionService:
         await TransactionService.insert_report_data(
             report_data,
             session,
-            transactions,
         )
+        key = f'{user_id}:{start_date}:{end_date}'
+        await redis.set(
+            key,
+            json.dumps(report_data, default=data_converter_dumps),
+        )
+
         return report_data
 
     @staticmethod
     async def insert_report_data(
         report_data: dict,
         session: AsyncSession,
-        transactions,
     ) -> None:
         """Вставка данных отчета в таблицу."""
         report = Report(**report_data)

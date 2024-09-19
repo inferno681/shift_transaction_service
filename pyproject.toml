@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "src"
-version = "0.5.0"
+version = "0.6.0"
 description = ""
 authors = ["Vasilii Stakrotckii <inferno681@gmail.com>"]
 readme = "README.md"
@@ -17,6 +17,7 @@ sqlalchemy-utils = "^0.41.2"
 psycopg2-binary = "^2.9.9"
 opentracing = "^2.4.0"
 jaeger-client = "^4.8.0"
+redis = "^5.0.8"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -23,3 +23,8 @@ jaeger:
   logging: True
   sampler_type: "const"
   sampler_param: 1
+
+redis:
+  url: "redis://redis:6379"
+  db: 1
+  decode_responses: True

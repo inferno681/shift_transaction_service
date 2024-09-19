@@ -93,6 +93,7 @@ app:
         tags_metadata_health:
           name: "Health"
           description: "Проверка доступности сервиса"
+
       jaeger:
         service_name: "stakrotckii_transaction_service"
         host: "infra-jaeger-agent"
@@ -100,5 +101,10 @@ app:
         logging: True
         sampler_type: "const"
         sampler_param: 1
+
+      redis:
+        url: "redis://redis-1:6379"
+        db: 1
+        decode_responses: True
   secret_data:
     db_password: cGFzc3dvcmQ=
