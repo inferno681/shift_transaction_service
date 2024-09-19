@@ -1,45 +1,26 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
 
-from app.constants import CREDIT, DEBIT, INVALID_TRANSACTION_TYPE_MESSAGE
-from app.main import app
-from app.service import report_storage, transaction_storage
-from tests.unit.service.conftest import USER_ID
+from app.constants import CREDIT, DEBIT
 
 
-@pytest.fixture
-def anyio_backend():
-    """Бэкэнд для тестирования."""
-    return 'asyncio'
+@pytest.fixture()
+async def clear_transaction_table():
+    """Фикстура очистки таблицы транзакций."""
+    from app.db import engine
 
-
-@pytest.fixture(autouse=True)
-def data_storage():
-    """Фикстура для очистки хранилища перед каждым текстом."""
-    transaction_storage.clear()
-    report_storage.clear()
-    yield
-    transaction_storage.clear()
-    report_storage.clear()
-
-
-@pytest.fixture
-async def client():
-    """Фикстура клиента."""
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url='http://127.0.0.1:8000/api/',
-    ) as client:
-        yield client
+    async with engine.connect() as conn:
+        await conn.execute(text('DELETE FROM transaction;'))
+        await conn.commit()
 
 
 @pytest.fixture()
 def debit_transaction():
     """Фикстура транзакции списания."""
     return {
-        'user_id': USER_ID,
+        'user_id': 1,
         'amount': 100,
         'transaction_type': DEBIT,
     }
@@ -49,7 +30,7 @@ def debit_transaction():
 def credit_transaction():
     """Фикстура транзакции пополнения."""
     return {
-        'user_id': USER_ID,
+        'user_id': 1,
         'amount': 200,
         'transaction_type': CREDIT,
     }
@@ -62,10 +43,52 @@ def transaction_data(request, debit_transaction, credit_transaction):
         return debit_transaction
     elif request.param == 'credit':
         return credit_transaction
-    else:
-        raise ValueError(
-            INVALID_TRANSACTION_TYPE_MESSAGE.format(value=request.param),
-        )
+
+
+@pytest.fixture()
+def no_user_transaction():
+    """Фикстура транзакции несуществующего пользователя."""
+    return {
+        'user_id': 100,
+        'amount': 100,
+        'transaction_type': DEBIT,
+    }
+
+
+@pytest.fixture()
+def wrong_type_transaction():
+    """Фикстура с некорректным типом транзакции."""
+    return {
+        'user_id': 1,
+        'amount': 200,
+        'transaction_type': 'wrong',
+    }
+
+
+@pytest.fixture()
+def wrong_amount_transaction():
+    """Фикстура транзакции с некорректной суммой."""
+    return {
+        'user_id': 1,
+        'amount': -100,
+        'transaction_type': DEBIT,
+    }
+
+
+@pytest.fixture()
+def wrong_transaction_data(
+    request,
+    no_user_transaction,
+    wrong_type_transaction,
+    wrong_amount_transaction,
+):
+    """Фикстура подстановки транзакций с некоррект."""
+    if request.param == 'no_user':
+        return no_user_transaction
+    elif request.param == 'wrong_type':
+        return wrong_type_transaction
+    elif request.param == 'wrong_amount':
+        return wrong_amount_transaction
 
 
 @pytest.fixture
@@ -84,7 +107,7 @@ def create_report_link():
 def report_data():
     """Данные для запроса отчета."""
     return {
-        'user_id': USER_ID,
+        'user_id': 1,
         'start_date': (datetime.now(UTC) - timedelta(days=1)).isoformat(),
         'end_date': (datetime.now(UTC) + timedelta(days=1)).isoformat(),
     }
@@ -94,7 +117,7 @@ def report_data():
 def wrong_report_data():
     """Некорректные данные для запроса отчета."""
     return {
-        'user_id': USER_ID,
+        'user_id': 1,
         'start_date': (datetime.now(UTC) + timedelta(days=1)).isoformat(),
         'end_date': (datetime.now(UTC) - timedelta(days=1)).isoformat(),
     }

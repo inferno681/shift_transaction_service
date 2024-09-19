@@ -1,0 +1,23 @@
+services:
+
+  db:
+    container_name: db
+    image: inferno681/pgvector
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+
+  transaction_service:
+    container_name: transaction_service
+    build:
+      context: .
+      dockerfile: Dockerfile_test
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - db

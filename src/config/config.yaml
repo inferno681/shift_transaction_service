@@ -4,6 +4,11 @@ service:
   host: "0.0.0.0"
   port: 8000
   debug: True
+  db_hostname: "db"
+  db_port: 5432
+  db_name: postgres
+  db_username: postgres
+  db_echo: False
   tags_metadata_transaction:
     name: "Transaction"
     description: "Управление транзакциями"
