@@ -21,7 +21,7 @@ async def create_transaction(
     transaction: TransactionCreate,
     session: AsyncSession = Depends(get_async_session),
 ):
-    """Эндпоинт создания транзакции."""
+    """Transaction creation endpoint."""
     with global_tracer().start_active_span('create_transaction') as scope:
         scope.span.set_tag('transaction', str(transaction))
         return await TransactionService.create_transaction(
@@ -36,7 +36,7 @@ async def create_report(
     request: Request,
     session: AsyncSession = Depends(get_async_session),
 ):
-    """Эндпоинт создания транзакции."""
+    """Report creation endpoint."""
     with global_tracer().start_active_span('create_report') as scope:
         scope.span.set_tag('report_request', str(report_request))
         return await TransactionService.create_report(
@@ -48,5 +48,5 @@ async def create_report(
 
 @router_healthz.get('/healthz/ready', response_model=IsReady)
 async def check_health():
-    """Эндпоинт проверки запущен ли сервис."""
+    """Health check endpoint."""
     return IsReady(is_ready=True)

@@ -19,7 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    """Создание функции и триггера для управления балансом."""
+    """Function and trigger creation for user balance."""
     op.execute(
         """
         CREATE OR REPLACE FUNCTION update_user_balance()
@@ -39,7 +39,6 @@ def upgrade() -> None:
         END IF;
 
         IF TG_OP = 'UPDATE' THEN
-            -- Если изменилось поле amount
             IF NEW.transaction_type = OLD.transaction_type THEN
                 IF NEW.transaction_type = 'credit' THEN
                     UPDATE "user"
@@ -102,7 +101,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Дроп функции и триггера для управления балансом."""
+    """Function and trigger drop."""
     op.execute(
         """
         DROP FUNCTION IF EXISTS update_user_balance();

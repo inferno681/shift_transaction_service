@@ -14,7 +14,7 @@ from app.db import Report, Transaction, TransactionType, User
 
 
 def data_converter_dumps(obj: Any):
-    """Функция ковертации данных для json.dumps()."""
+    """Convert data for json.dumps()."""
     if isinstance(obj, datetime):
         return obj.isoformat()
     if isinstance(obj, Transaction):
@@ -22,7 +22,7 @@ def data_converter_dumps(obj: Any):
 
 
 class TransactionService:
-    """Класс с методами для работы с транзакциями."""
+    """Transaction service."""
 
     @staticmethod
     async def create_transaction(
@@ -31,7 +31,7 @@ class TransactionService:
         transaction_type: TransactionType,
         session: AsyncSession,
     ) -> Transaction:
-        """Создание транзакции и добавление ее в хранилище."""
+        """Transaction creation."""
         user = await session.get(User, user_id)
         if not user:
             raise HTTPException(
@@ -64,7 +64,7 @@ class TransactionService:
         session: AsyncSession,
         redis: Redis,
     ) -> dict[str, Any]:
-        """Формирование отчета по транзакциям пользователя."""
+        """Report creation."""
         key = f'{user_id}:{start_date}:{end_date}'
         redis_result = await redis.get(key)
         if redis_result:
@@ -146,7 +146,7 @@ class TransactionService:
         report_data: dict,
         session: AsyncSession,
     ) -> None:
-        """Вставка данных отчета в таблицу."""
+        """Save data to db."""
         report = Report(**report_data)
         session.add(report)
         await session.commit()

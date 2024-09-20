@@ -29,7 +29,7 @@ Base.metadata.reflect(sync_engine, only=['user'])
 
 
 class User(Base):
-    """Модель пользователя."""
+    """User model."""
 
     __table__ = Base.metadata.tables['user']
     transactions: Mapped['Transaction'] = relationship(back_populates='user')
@@ -37,14 +37,14 @@ class User(Base):
 
 
 class TransactionType(Enum):
-    """Типы транзакций."""
+    """Transaction types."""
 
     debit = DEBIT
     credit = CREDIT
 
 
 class ReportTransaction(Base):
-    """Промежуточная таблица М2М."""
+    """М2М table between reports and transactions."""
 
     __tablename__ = 'report_transaction'
     report_id: Mapped[int] = mapped_column(
@@ -59,7 +59,7 @@ class ReportTransaction(Base):
 
 
 class Transaction(Base):
-    """Модель Транзакции."""
+    """Transaction model."""
 
     id: Mapped[intpk]
     user_id: Mapped[intfk_user]
@@ -75,7 +75,7 @@ class Transaction(Base):
 
 
 class Report(Base):
-    """Модель для хранения отчетов."""
+    """Report model."""
 
     id: Mapped[intpk]
     user_id: Mapped[intfk_user]
