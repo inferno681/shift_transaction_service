@@ -5,7 +5,7 @@ on:
   types: [opened, synchronize, reopened]
 
 jobs:
- pre-commit:
+ linters:
   runs-on: ubuntu-latest
   steps:
     - name: Checkout
@@ -26,3 +26,19 @@ jobs:
       run:  |
         poetry run flake8 src/
         poetry run mypy src/
+
+ tests:
+  runs-on: ubuntu-latest
+  services:
+    docker:
+      image: docker
+      options: --privileged
+  steps:
+    - uses: actions/checkout@v4
+    - name: Set up Docker Compose
+      run: |
+        docker compose -f docker-compose-test.yaml up -d --build
+    - name: Run Pytest
+      run: docker compose -f docker-compose-test.yaml exec transaction_service pytest --cov --cov-fail-under=90 --cov-report term-missing
+    - name: Tear down Docker Compose
+      run: docker compose -f docker-compose-test.yaml down
