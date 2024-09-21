@@ -13,6 +13,6 @@ async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
 async def get_async_session():
-    """Генератор асинхронных сессий."""
+    """Async sessions generator."""
     async with async_session() as session:
         yield session

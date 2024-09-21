@@ -12,7 +12,7 @@ config.service.db_name = 'test_db'  # type: ignore
 
 @pytest.fixture(scope='session', autouse=True)
 async def crate_and_drop_database():
-    """Фикстура подготовки базы данных для тестов."""
+    """Database preparation  before test.."""
     create_database(config.sync_database_url)
 
     engine = create_async_engine(url=config.database_url)
@@ -37,7 +37,6 @@ async def crate_and_drop_database():
             """,
             ),
         )
-        await conn.execute(text('CREATE EXTENSION IF NOT EXISTS vector;'))
         await conn.commit()
         from app.db import Base
     async with engine.begin() as conn:
@@ -46,7 +45,6 @@ async def crate_and_drop_database():
     yield
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-        await conn.execute(text('DROP EXTENSION IF EXISTS vector;'))
         await conn.commit()
     drop_database(config.sync_database_url)
     await engine.dispose()
@@ -54,13 +52,13 @@ async def crate_and_drop_database():
 
 @pytest.fixture(scope='session')
 def anyio_backend():
-    """Бэкэнд для тестирования."""
+    """Backend for test."""
     return 'asyncio'
 
 
 @pytest.fixture(scope='session')
 async def client():
-    """Фикстура клиента."""
+    """Client for testing."""
     from app.main import app
 
     async with LifespanManager(app):

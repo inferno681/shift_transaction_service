@@ -23,7 +23,7 @@ config.set_main_option(
 
 
 def reflect_metadata():
-    """Подгрузка метаданных из базы данных."""
+    """Database reflection."""
     Base.metadata.reflect(bind=sync_engine)
 
 

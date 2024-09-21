@@ -14,7 +14,7 @@ from app.service import TransactionType
 
 
 class TransactionCreate(BaseModel):
-    """Схема создания транзакции."""
+    """Transaction creation scheme."""
 
     user_id: PositiveInt
     amount: PositiveInt | PositiveFloat
@@ -22,20 +22,20 @@ class TransactionCreate(BaseModel):
 
 
 class TransactionRead(TransactionCreate):
-    """Схема чтения транзакции."""
+    """Transaction read scheme."""
 
     id: PositiveInt
     created_at: datetime
 
 
 class TransactionInReport(TransactionRead):
-    """Схема чтения транзакции."""
+    """Transactions in report read scheme."""
 
     user_id: PositiveInt = Field(exclude=True)
 
 
 class TransactionReportCreate(BaseModel):
-    """Схема создания отчета."""
+    """Report creation scheme."""
 
     user_id: PositiveInt
     start_date: datetime
@@ -43,7 +43,7 @@ class TransactionReportCreate(BaseModel):
 
     @model_validator(mode='after')
     def check_dates(self):
-        """Проверка дат."""
+        """Dates check."""
         start_date = self.start_date
         end_date = self.end_date
         if start_date and end_date and start_date > end_date:
@@ -55,7 +55,7 @@ class TransactionReportCreate(BaseModel):
 
 
 class TransactionReport(TransactionReportCreate):
-    """Схема отчета."""
+    """Report scheme."""
 
     transactions: list[TransactionInReport | None]
     debit: int
@@ -63,6 +63,6 @@ class TransactionReport(TransactionReportCreate):
 
 
 class IsReady(BaseModel):
-    """Схема ответа health check."""
+    """Health check response scheme."""
 
     is_ready: bool

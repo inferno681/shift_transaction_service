@@ -26,7 +26,7 @@ tags_metadata = [
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Запуск и остановка трейсера перед запуском приложения."""
+    """Tracer and redis start and stop."""
     tracer_config = Config(
         config={
             'sampler': {
@@ -79,7 +79,7 @@ app.include_router(
 
 @app.middleware('http')
 async def tracing_middleware(request: Request, call_next):
-    """Middleware для трейсинга."""
+    """Tracing middleware."""
     path = request.url.path
     if path.endswith(('/ready', '/metrics', '/docs', '/openapi.json')):
         return await call_next(request)

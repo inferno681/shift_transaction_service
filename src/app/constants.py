@@ -1,30 +1,21 @@
-from decimal import Decimal
+"""Fields names."""
 
-"""Названия полей."""
+CREDIT = 'credit'
+DEBIT = 'debit'
+TRANSACTIONS = 'Transactions'
 
-CREDIT = 'пополнение'
-DEBIT = 'списание'
-TRANSACTIONS = 'Транзакции'
 
-"""Значения по умолчанию."""
-DEFAULT_BALANCE = Decimal('500.00')
+"""Types and values errors."""
+INVALID_INT_MESSAGE = 'Value {value} is not int'
+INVALID_INT_FLOAT_MESSAGE = 'Value {value} is not int or float'
+INVALID_TRANSACTION_TYPE_MESSAGE = 'Value {value} is not TransactionType'
+WRONG_AMOUNT_MESSAGE = 'Transaction amount cannot be less than zero'
+WRONG_ID_MESSAGE = 'ID must be positive'
 
-"""Ошибки типов и значений."""
-INVALID_INT_MESSAGE = 'Значение {value} не соответствует типу int'
-INVALID_INT_FLOAT_MESSAGE = (
-    'Значение {value} не соответствует типам int или float'
-)
-INVALID_DECIMAL_MESSAGE = 'Значение {value} не соответствует типу decimal'
-INVALID_TRANSACTION_TYPE_MESSAGE = (
-    'Значение {value} не соответствует типу TransactionType'
-)
-WRONG_AMOUNT_MESSAGE = 'Сумма транзакции не может быть меньше нуля'
-WRONG_ID_MESSAGE = 'Идентификатор должен быть положительным'
+"""Data validation errors."""
+INVALID_DATES = 'The start of the time period cannot be later than its end'
 
-"""Ошибки при валидации данных."""
-INVALID_DATES = 'Начало временного периода не может быть позже его окончания'
+"""Error messages for the API"""
 
-"""Сообщения об ошибках для АПИ"""
-
-USER_NOT_FOUND = 'Пользователь не найден'
-FORBIDDEN = 'Недостаточно прав для выполнения операции'
+USER_NOT_FOUND = 'User not found'
+FORBIDDEN = 'Insufficient permissions to perform the operation'

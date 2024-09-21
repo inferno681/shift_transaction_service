@@ -78,7 +78,7 @@ app:
     config.yaml: |
       service:
         title: "Transaction service"
-        description: "Сервис транзакций"
+        description: "Transaction service"
         host: "0.0.0.0"
         port: 8000
         debug: True
@@ -89,10 +89,10 @@ app:
         db_echo: False
         tags_metadata_transaction:
           name: "Transaction"
-          description: "Управление транзакциями"
+          description: "Transaction creation"
         tags_metadata_health:
           name: "Health"
-          description: "Проверка доступности сервиса"
+          description: "Health check"
 
       jaeger:
         service_name: "stakrotckii_transaction_service"

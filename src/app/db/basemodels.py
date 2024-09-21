@@ -5,17 +5,17 @@ from sqlalchemy.orm import DeclarativeBase, declared_attr
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    """Абстрактный базовый класс для создания таблиц."""
+    """Abstract base class for tables creation."""
 
     __abstract__ = True
 
     @declared_attr
     def __tablename__(cls):
-        """Использование названий таблиц из названий класса."""
+        """Table name from class name."""
         return cls.__name__.lower()
 
     def to_dict(self):
-        """Функция ковертации модели в словарь."""
+        """Model to dict."""
         return {
             field.name: (
                 getattr(self, field.name).value

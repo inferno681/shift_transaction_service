@@ -17,7 +17,7 @@ async def test_create_transaction(
     create_transaction_link,
     transaction_data,
 ):
-    """Тест создания транзакции."""
+    """Transaction creation test."""
     response = await client.post(
         create_transaction_link,
         json=transaction_data,
@@ -42,9 +42,9 @@ async def test_create_report(
     create_report_link,
     create_transaction_link,
     report_data,
-    clear_transaction_table,
+    clean_transaction_table,
 ):
-    """Тест создания отчета."""
+    """Report creation test."""
     await client.post(create_transaction_link, json=debit_transaction)
     await client.post(create_transaction_link, json=credit_transaction)
     response = await client.post(create_report_link, json=report_data)
@@ -61,9 +61,9 @@ async def test_take_report_db(
     create_report_link,
     create_transaction_link,
     report_data,
-    clear_transaction_table,
+    clean_transaction_table,
 ):
-    """Тест создания отчета."""
+    """Report receiving from db."""
     await client.post(create_transaction_link, json=debit_transaction)
     await client.post(create_transaction_link, json=credit_transaction)
     await client.post(create_report_link, json=report_data)
@@ -82,7 +82,7 @@ async def test_create_report_wrong_dates(
     create_transaction_link,
     wrong_report_data,
 ):
-    """Тест создания отчета."""
+    """Wrong dates report creation."""
     await client.post(create_transaction_link, json=debit_transaction)
     await client.post(create_transaction_link, json=credit_transaction)
     response = await client.post(create_report_link, json=wrong_report_data)
@@ -92,7 +92,7 @@ async def test_create_report_wrong_dates(
 
 @pytest.mark.anyio
 async def test_check_healthz(client, check_health_link):
-    """Тест проверки запущени ли сервис."""
+    """Health check test."""
     response = await client.get(check_health_link)
     assert response.status_code == 200
     assert response.json()['is_ready'] is True
@@ -114,7 +114,7 @@ async def test_wrong_transaction(
     wrong_transaction_data,
     status_code,
 ):
-    """Тест транзакций с некорректными данными."""
+    """Wrong data transaction creation test."""
     response = await client.post(
         create_transaction_link,
         json=wrong_transaction_data,
