@@ -1,44 +1,44 @@
-# История версий
+# Changelog
 
 ## 0.1.0
-### Добавлено
-- Добавлены методы создания транзакции и получения отчета по транзакциям пользователя
+### Added
+- Added methods for creating transactions and retrieving user transaction reports
 
 ## 0.1.1
-### Добавлено
-- Добалена базовая документация к проекту
-### Изменено
-- Изменена структура. Структура тестов соответствует структуре приложения. Файл main.py переименован в service.py
+### Added
+- Added basic project documentation
+### Changed
+- Changed structure: test structure now matches the application structure. The `main.py` file has been renamed to `service.py`.
 
 ## 0.2.0
-### Добавлено
-- Добавлен API
-- Добавлены интеграционные тесты
-### Изменено
-- Изменена структура. Структура тестов соответствует структуре приложения. Точка входа - main.py. Вся бизнес-логика перенесена в папку service.
+### Added
+- Added API
+- Added integration tests
+### Changed
+- Changed structure: test structure now matches the application structure. The entry point is now `main.py`, and all business logic has been moved to the `service` folder.
 
 ## 0.2.1
-### Добавлено
-- Добавлен Dockerfile
-- В CI добавлен шаг со сборкой контейнера и загрузкой на dockerhub
+### Added
+- Added Dockerfile
+- CI now includes a container build step and upload to Docker Hub
 
 ## 0.2.2
-### Добавлено
-- Добавлен Health check
+### Added
+- Added Health check
 
 ## 0.3.0
-### Добавлено
-- Добавлена база данных
+### Added
+- Added database
 
 ## 0.4.0
-### Добавлено
-- Добавлены манифесты для запуска в кубернетис
-- Добавлены чарты для Helm
+### Added
+- Added manifests for Kubernetes deployment
+- Added Helm charts
 
 ## 0.5.0
-### Добавлено
-- Добавленa трассировка
+### Added
+- Added tracing
 
 ## 0.6.0
-### Добавлено
-- Добавлено хранение отчетов в redis
+### Added
+- Added report storage in Redis

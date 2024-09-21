@@ -7,8 +7,8 @@ from app.constants import CREDIT, DEBIT
 
 
 @pytest.fixture()
-async def clear_transaction_table():
-    """Фикстура очистки таблицы транзакций."""
+async def clean_transaction_table():
+    """Transaction table cleaning."""
     from app.db import engine
 
     async with engine.connect() as conn:
@@ -18,7 +18,7 @@ async def clear_transaction_table():
 
 @pytest.fixture()
 def debit_transaction():
-    """Фикстура транзакции списания."""
+    """Debit transaction."""
     return {
         'user_id': 1,
         'amount': 100,
@@ -28,7 +28,7 @@ def debit_transaction():
 
 @pytest.fixture()
 def credit_transaction():
-    """Фикстура транзакции пополнения."""
+    """Credit transaction."""
     return {
         'user_id': 1,
         'amount': 200,
@@ -38,7 +38,7 @@ def credit_transaction():
 
 @pytest.fixture()
 def transaction_data(request, debit_transaction, credit_transaction):
-    """Фикстура подстановки транзакций списания и пополнения."""
+    """Transactions due to the request."""
     if request.param == 'debit':
         return debit_transaction
     elif request.param == 'credit':
@@ -47,7 +47,7 @@ def transaction_data(request, debit_transaction, credit_transaction):
 
 @pytest.fixture()
 def no_user_transaction():
-    """Фикстура транзакции несуществующего пользователя."""
+    """Incorrect user_id transaction."""
     return {
         'user_id': 100,
         'amount': 100,
@@ -57,7 +57,7 @@ def no_user_transaction():
 
 @pytest.fixture()
 def wrong_type_transaction():
-    """Фикстура с некорректным типом транзакции."""
+    """Wrong type transaction."""
     return {
         'user_id': 1,
         'amount': 200,
@@ -67,7 +67,7 @@ def wrong_type_transaction():
 
 @pytest.fixture()
 def wrong_amount_transaction():
-    """Фикстура транзакции с некорректной суммой."""
+    """Wrong amount transaction."""
     return {
         'user_id': 1,
         'amount': -100,
@@ -82,7 +82,7 @@ def wrong_transaction_data(
     wrong_type_transaction,
     wrong_amount_transaction,
 ):
-    """Фикстура подстановки транзакций с некоррект."""
+    """Incorrect data transaction due to the request."""
     if request.param == 'no_user':
         return no_user_transaction
     elif request.param == 'wrong_type':
@@ -93,19 +93,19 @@ def wrong_transaction_data(
 
 @pytest.fixture
 def create_transaction_link():
-    """Ссылка на создание транзакции."""
+    """Transaction creation link."""
     return '/create_transaction'
 
 
 @pytest.fixture
 def create_report_link():
-    """Ссылка на создание отчета."""
+    """Report creation link."""
     return '/create_report'
 
 
 @pytest.fixture
 def report_data():
-    """Данные для запроса отчета."""
+    """Report request data."""
     return {
         'user_id': 1,
         'start_date': (datetime.now(UTC) - timedelta(days=1)).isoformat(),
@@ -115,7 +115,7 @@ def report_data():
 
 @pytest.fixture
 def wrong_report_data():
-    """Некорректные данные для запроса отчета."""
+    """Incorrect report request data."""
     return {
         'user_id': 1,
         'start_date': (datetime.now(UTC) + timedelta(days=1)).isoformat(),
@@ -125,5 +125,5 @@ def wrong_report_data():
 
 @pytest.fixture
 def check_health_link():
-    """Фикстура со ссылкой на проверку готовности сервиса."""
+    """Health check link."""
     return '/healthz/ready'

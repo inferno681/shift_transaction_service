@@ -44,7 +44,7 @@ class TransactionType(Enum):
 
 
 class ReportTransaction(Base):
-    """М2М table between reports and transactions."""
+    """M2M table between reports and transactions."""
 
     __tablename__ = 'report_transaction'
     report_id: Mapped[int] = mapped_column(

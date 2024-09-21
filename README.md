@@ -1,13 +1,13 @@
-# Transaction service
+# Transaction Service
 
-Cервис обработки транзакций пользователя.
+A service for processing user transactions.
 
-## Реализованы следующие возможности
+## The following features are implemented
 
-### Создание транзакции
+### Creating a transaction
 
-На основе ID пользователя, суммы и типа транзакции (списание/пополнение) сервис сохраняет запись о транзакции в хранилище, дополнительно проставляя метку времени сохранения.
+Based on the user ID, transaction amount, and type (debit/credit), the service saves a record of the transaction in the storage, adding a timestamp of when the transaction was saved.
 
-### Получение отчета по транзакциям пользователя
+### Retrieving user transaction report
 
-На основе ID пользователя и временного интервала сервис формирует отчет о транзакциях пользователя за указанный период. Дополнительно, этот отчет сохраняется в хранилище (в дальнейшем будет использован Redis).
+Based on the user ID and time range, the service generates a report of the user's transactions for the specified period. Additionally, this report is saved in the database and in Redis.
