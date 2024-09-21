@@ -7,6 +7,7 @@ on:
 
 jobs:
   test:
+    name: Run tests
     runs-on: ubuntu-latest
     services:
       docker:
@@ -32,6 +33,7 @@ jobs:
   build_and_push_to_docker_hub:
     name: Push Docker image to DockerHub
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -50,6 +52,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.CONTAINER_NAME }}:latest
 
   send_message:
+    name: Send message
     runs-on: ubuntu-latest
     needs:
       - test
