@@ -22,13 +22,17 @@ jobs:
         pip install poetry
         poetry install
 
-    - name: Linter and mypy
+    - name: flake8
       run:  |
         poetry run flake8 src/
+
+    - name: mypy
+      run:  |
         poetry run mypy src/
 
  tests:
   runs-on: ubuntu-latest
+  needs: linters
   services:
     docker:
       image: docker
@@ -41,4 +45,5 @@ jobs:
     - name: Run Pytest
       run: docker compose -f docker-compose-test.yaml exec transaction_service pytest --cov --cov-fail-under=90 --cov-report term-missing
     - name: Tear down Docker Compose
+      if: always()
       run: docker compose -f docker-compose-test.yaml down
