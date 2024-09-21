@@ -1,3 +1,5 @@
+[![main](https://github.com/inferno681/shift_transaction_service/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/inferno681/shift_transaction_service/actions/workflows/main.yaml)
+[![codecov](https://codecov.io/github/inferno681/shift_transaction_service/graph/badge.svg?token=U65US40JP5)](https://codecov.io/github/inferno681/shift_transaction_service)
 # Transaction Service
 
 A service for processing user transactions.
